@@ -191,7 +191,7 @@ void GridLayout::calculateWorkspace(const int &ws)
         NODE = tempNodes[0];
         cw = (w_width - 2 * (*GAPPO)) * 0.7;
         ch = (w_height - 2 * (*GAPPO)) * 0.8;
-        resizeNodeSizePos(NODE, w_x + (int)((m_width - cw) / 2), w_y + (int)((w_height - ch) / 2),
+        resizeNodeSizePos(NODE, m_x + w_x + (int)((m_width - cw) / 2), m_y + w_y + (int)((w_height - ch) / 2),
                           cw - 2 * (*PBORDERSIZE), ch - 2 * (*PBORDERSIZE));
         return;
     }
@@ -227,7 +227,7 @@ void GridLayout::calculateWorkspace(const int &ws)
         {
             cx += dx;
         }
-        resizeNodeSizePos(NODE, cx + (*GAPPO), cy + (*GAPPO), cw - 2 * (*PBORDERSIZE), ch - 2 * (*PBORDERSIZE));
+        resizeNodeSizePos(NODE, m_x + cx + (*GAPPO), m_y + cy + (*GAPPO), cw - 2 * (*PBORDERSIZE), ch - 2 * (*PBORDERSIZE));
     }
 }
 
