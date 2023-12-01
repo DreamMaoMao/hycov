@@ -309,7 +309,7 @@ void GridLayout::changeToActivceSourceWorkspace()
         pWorksapce = g_pCompositor->getWorkspaceByID(pWindow->m_iWorkspaceID); 
         pMonitor->activeWorkspace = pWindow->m_iWorkspaceID;        
     }
-    pMonitor->changeWorkspace(pWorksapce);
+    // pMonitor->changeWorkspace(pWorksapce);
     hycov_log(LOG,"changeToWorkspace:{}",pWorksapce->m_iID);
     g_pEventManager->postEvent(SHyprIPCEvent{"workspace", pWorksapce->m_szName});
     EMIT_HOOK_EVENT("workspace", pWorksapce);
