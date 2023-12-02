@@ -63,6 +63,7 @@ plugin {
         disable_workspace_change = 0 # disable workspace change when in overview mode
         disable_spawn = 0 # disable bind exec when in overview mode
         auto_exit = 1 # enable auto exit when no client in overview
+        auto_fullscreen = 0 # auto make active window maximize after exit overview
     }
 }
 

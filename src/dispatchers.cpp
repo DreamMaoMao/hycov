@@ -345,12 +345,15 @@ void dispatch_leaveoverview(std::string arg)
 		g_pCompositor->focusWindow(pActiveWindow); //restore the focus to before active window
 		if(pActiveWindow->m_bIsFloating)
 			g_pCompositor->changeWindowZOrder(pActiveWindow, true);
+		else if(g_auto_fullscreen) {
+			g_pCompositor->setWindowFullscreen(pActiveWindow,true,FULLSCREEN_MAXIMIZED);
+		}
 
 	} else {
 		auto node = g_GridLayout->m_lGridNodesData.back();
 		g_pCompositor->focusWindow(node.pWindow);
 	}
-	
+
 	for (auto &n : g_GridLayout->m_lGridNodesData)
 	{
 		//make all fullscrenn windwo restore it's status
