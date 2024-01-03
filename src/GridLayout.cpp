@@ -130,6 +130,7 @@ void GridLayout::removeOldLayoutData(CWindow *pWindow) {
 
 void GridLayout::onWindowRemovedTiling(CWindow *pWindow)
 {
+    hycov_log(LOG,"remove tiling windwo:{}",pWindow);
     removeOldLayoutData(pWindow);
 
     const auto pNode = getNodeFromWindow(pWindow);
