@@ -59,7 +59,6 @@ public:
   void moveWindowToSourceWorkspace();
   void changeToActivceSourceWorkspace();
   void removeOldLayoutData(CWindow *pWindow);
-  void changeLayout(std::string layout);
 
   bool isFromOnEnable = false;
 private:
