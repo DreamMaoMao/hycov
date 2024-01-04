@@ -1,6 +1,7 @@
 
 #include "globals.hpp"
 #include "GridLayout.hpp"
+#include "dispatchers.hpp"
 
 SGridNodeData *GridLayout::getNodeFromWindow(CWindow *pWindow)
 {
@@ -131,13 +132,17 @@ void GridLayout::removeOldLayoutData(CWindow *pWindow) {
 void GridLayout::onWindowRemovedTiling(CWindow *pWindow)
 {
     hycov_log(LOG,"remove tiling windwo:{}",pWindow);
-    removeOldLayoutData(pWindow);
 
     const auto pNode = getNodeFromWindow(pWindow);
     SGridNodeData lastNode;
 
     if (!pNode)
         return;
+
+    if(pNode->isInOldLayout) {
+        removeOldLayoutData(pWindow);
+    }
+
     m_lGridNodesData.remove(*pNode);
 
     if(m_lGridNodesData.empty()){
@@ -426,4 +431,5 @@ void GridLayout::onEnable()
 void GridLayout::onDisable()
 {
     //  m_lGridNodesData.clear();
+    dispatch_leaveoverview("");
 }
