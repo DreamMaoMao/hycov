@@ -11,15 +11,13 @@ void recalculateAllMonitor() {
 	}
 }
 
+// only change layout,keep data of previous layout
 void switchToLayoutWithoutReleaseData(std::string layout) {
     for (size_t i = 0; i < g_pLayoutManager->m_vLayouts.size(); ++i) {
         if (g_pLayoutManager->m_vLayouts[i].first == layout) {
             if (i == (size_t)g_pLayoutManager->m_iCurrentLayoutID)
                 return;
-
-            // getCurrentLayout()->onDisable();
             g_pLayoutManager->m_iCurrentLayoutID = i;
-            // getCurrentLayout()->onEnable();
             return;
         }
     }

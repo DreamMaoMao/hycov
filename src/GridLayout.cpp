@@ -1,6 +1,7 @@
 
 #include "globals.hpp"
 #include "GridLayout.hpp"
+#include "dispatchers.hpp"
 
 SGridNodeData *GridLayout::getNodeFromWindow(CWindow *pWindow)
 {
@@ -43,7 +44,7 @@ void GridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
     const auto pWindowOriWorkspace = g_pCompositor->getWorkspaceByID(pWindow->m_iWorkspaceID);
 
     if(isFromOnEnable) {
-        pNode->isInOldLayout = true;
+        pNode->isInOldLayout = true; //client is taken from the old layout
         isFromOnEnable = false;
     }
 
@@ -87,28 +88,20 @@ void GridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
     recalculateMonitor(pWindow->m_iMonitorID);
 }
 
-void GridLayout::changeLayout(std::string layout) {
-    for (size_t i = 0; i < g_pLayoutManager->m_vLayouts.size(); ++i) {
-        if (g_pLayoutManager->m_vLayouts[i].first == layout) {
-            if (i == (size_t)g_pLayoutManager->m_iCurrentLayoutID)
-                return;
-            g_pLayoutManager->m_iCurrentLayoutID = i;
-            return;
-        }
-    }    
-}
 
-void GridLayout::removeOldLayoutData(CWindow *pWindow) {
+void GridLayout::removeOldLayoutData(CWindow *pWindow) { 
 
 	std::string *configLayoutName = &HyprlandAPI::getConfigValue(PHANDLE, "general:layout")->strValue;
-    changeLayout(*configLayoutName);
+    switchToLayoutWithoutReleaseData(*configLayoutName);
     hycov_log(LOG,"remove data of old layout:{}",*configLayoutName);
 
     if(*configLayoutName == "dwindle") {
+        // disable render client of old layout
         g_pHyprDwindleLayout_recalculateMonitor->hook();
         g_pHyprDwindleLayout_recalculateWindow->hook();
         g_pSDwindleNodeData_recalcSizePosRecursive->hook();
 
+        // only remove data,not render anything,becaust still in overview
         g_pLayoutManager->getCurrentLayout()->onWindowRemovedTiling(pWindow);
 
         g_pSDwindleNodeData_recalcSizePosRecursive->unhook();
@@ -121,23 +114,28 @@ void GridLayout::removeOldLayoutData(CWindow *pWindow) {
 
         g_pHyprMasterLayout_recalculateMonitor->unhook();
     } else {
+        // may be not support other layout
         hycov_log(ERR,"unknow old layout:{}",*configLayoutName);
         g_pLayoutManager->getCurrentLayout()->onWindowRemovedTiling(pWindow);
     }
 
-    changeLayout("grid");
+    switchToLayoutWithoutReleaseData("grid");
 }
 
 void GridLayout::onWindowRemovedTiling(CWindow *pWindow)
 {
     hycov_log(LOG,"remove tiling windwo:{}",pWindow);
-    removeOldLayoutData(pWindow);
 
     const auto pNode = getNodeFromWindow(pWindow);
     SGridNodeData lastNode;
 
     if (!pNode)
         return;
+
+    if(pNode->isInOldLayout) { // if client is taken from the old layout
+        removeOldLayoutData(pWindow);
+    }
+
     m_lGridNodesData.remove(*pNode);
 
     if(m_lGridNodesData.empty()){
@@ -408,7 +406,7 @@ void GridLayout::onEnable()
 
     for (auto &w : g_pCompositor->m_vWindows)
     {
-        isFromOnEnable = true;
+        isFromOnEnable = true; //mark client is taken from the old layout
         
         CWindow *pWindow = w.get();
 
@@ -425,5 +423,5 @@ void GridLayout::onEnable()
 // it will exec once when change layout disable
 void GridLayout::onDisable()
 {
-    //  m_lGridNodesData.clear();
+    dispatch_leaveoverview("");
 }
