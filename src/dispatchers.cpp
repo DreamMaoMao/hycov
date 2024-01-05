@@ -491,7 +491,7 @@ void dispatch_leaveoverview(std::string arg)
 		}
 		
 		// if client not in old layout,create tiling of the client
-		if (!n.isInOldLayout) {
+		if (!n.isInOldLayout || (n.ovbk_size.x == 0 && n.ovbk_size.y == 0)) {
 			g_pLayoutManager->getCurrentLayout()->onWindowCreatedTiling(n.pWindow);
 		}
 	}
