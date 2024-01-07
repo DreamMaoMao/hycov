@@ -49,6 +49,7 @@ inline CFunctionHook* g_pHyprDwindleLayout_recalculateMonitor = nullptr;
 inline CFunctionHook* g_pHyprMasterLayout_recalculateMonitor = nullptr;
 inline CFunctionHook* g_pHyprDwindleLayout_recalculateWindow = nullptr;
 inline CFunctionHook* g_pSDwindleNodeData_recalcSizePosRecursive = nullptr;
+inline CFunctionHook* g_pCInputManager_onMouseButton = nullptr;
 
 inline void errorNotif()
 {

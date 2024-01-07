@@ -15,6 +15,8 @@ typedef void (*origOnWindowRemovedTiling)(void*, CWindow *pWindow);
 typedef void (*origStartAnim)(void*, bool in, bool left, bool instant);
 typedef void (*origFullscreenActive)(std::string args);
 typedef void (*origOnKeyboardKey)(void*, wlr_keyboard_key_event* e, SKeyboard* pKeyboard);
+typedef void (*origCInputManager_onMouseButton)(void* , wlr_pointer_button_event* e);
+
 
 static double gesture_dx,gesture_previous_dx;
 static double gesture_dy,gesture_previous_dy;
@@ -108,39 +110,38 @@ static void mouseMoveHook(void *, SCallbackInfo &info, std::any data)
   toggle_hotarea(coordinate.x, coordinate.y);
 }
 
-static void mouseButtonHook(void *, SCallbackInfo &info, std::any data)
+static void hkCInputManager_onMouseButton(void* thisptr, wlr_pointer_button_event* e)
 {
-  if(!g_isOverView)
+  if(!g_isOverView) {
+    (*(origCInputManager_onMouseButton)g_pCInputManager_onMouseButton->m_pOriginal)(thisptr, e);
     return;
+  }
     
-  wlr_pointer_button_event *pEvent = std::any_cast<wlr_pointer_button_event *>(data); // 这个事件的数据解析可以参考dwl怎么解析出是哪个按键的
-  info.cancelled = false;
   CWindow *pTargetWindow = g_pCompositor->windowFromCursor();
   if(pTargetWindow && pTargetWindow != g_pCompositor->m_pLastWindow) {
     g_pCompositor->focusWindow(pTargetWindow);
   } else if(!pTargetWindow) {
-    // info.cancelled = true; //overview mode only can click window,disable click bar or other layer
     return;
   } 
 
-  switch (pEvent->button)
+  switch (e->button)
   {
   case BTN_LEFT:
-    if (g_isOverView && pEvent->state == WLR_BUTTON_PRESSED)
+    if (g_isOverView && e->state == WLR_BUTTON_PRESSED)
     {
       dispatch_toggleoverview("internalToggle");
-      info.cancelled = true;  // Prevent the event from continuing to be passed to the client
+      return;
     }
     break;
   case BTN_RIGHT:
-    if (g_isOverView && pEvent->state == WLR_BUTTON_PRESSED)
+    if (g_isOverView && e->state == WLR_BUTTON_PRESSED)
     {
       g_pHyprRenderer->damageWindow(g_pCompositor->m_pLastWindow);
       g_pCompositor->closeWindow(g_pCompositor->m_pLastWindow);
-      info.cancelled = true; // Prevent the event from continuing to be passed to the client
+      return;
     }
     break;
-  }
+  }  
 }
 
 static void hkOnWindowRemovedTiling(void* thisptr, CWindow *pWindow) {
@@ -292,6 +293,9 @@ void registerGlobalEventHook()
   g_pSDwindleNodeData_recalcSizePosRecursive = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&SDwindleNodeData::recalcSizePosRecursive, (void*)&hkSDwindleNodeData_recalcSizePosRecursive);
 
 
+  //mousebutto
+  g_pCInputManager_onMouseButton = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::onMouseButton, (void*)&hkCInputManager_onMouseButton);
+
   //create private function hook
 
   // hook function of changeworkspace
@@ -312,8 +316,8 @@ void registerGlobalEventHook()
 
   //register pEvent hook
   if(g_enable_hotarea){
+    g_pCInputManager_onMouseButton->hook();
     HyprlandAPI::registerCallbackDynamic(PHANDLE, "mouseMove",[&](void* self, SCallbackInfo& info, std::any data) { mouseMoveHook(self, info, data); });
-    HyprlandAPI::registerCallbackDynamic(PHANDLE, "mouseButton", [&](void* self, SCallbackInfo& info, std::any data) { mouseButtonHook(self, info, data); });
   }
 
   //if enable gesture, apply hook Swipe function 
