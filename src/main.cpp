@@ -65,6 +65,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 	registerGlobalEventHook();
 	registerDispatchers();
 
+ 	HyprlandAPI::reloadConfig();
 	return {"hycov", "clients overview", "DreamMaoMao", "0.1"};
 }
 
