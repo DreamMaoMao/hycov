@@ -142,6 +142,9 @@ static void hkCInputManager_onMouseButton(void* thisptr, wlr_pointer_button_even
     }
     break;
   }  
+
+  (*(origCInputManager_onMouseButton)g_pCInputManager_onMouseButton->m_pOriginal)(thisptr, e);
+
 }
 
 static void hkOnWindowRemovedTiling(void* thisptr, CWindow *pWindow) {
