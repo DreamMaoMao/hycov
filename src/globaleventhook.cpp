@@ -112,39 +112,36 @@ static void mouseMoveHook(void *, SCallbackInfo &info, std::any data)
 
 static void hkCInputManager_onMouseButton(void* thisptr, wlr_pointer_button_event* e)
 {
-  if(!g_isOverView) {
+  if(g_isOverView && (e->button == BTN_LEFT || e->button == BTN_RIGHT) ) {
+
+    CWindow *pTargetWindow = g_pCompositor->windowFromCursor();
+    if(pTargetWindow && pTargetWindow != g_pCompositor->m_pLastWindow) {
+      g_pCompositor->focusWindow(pTargetWindow);
+    } else if(!pTargetWindow) {
+      return;
+    } 
+
+    switch (e->button)
+    {
+    case BTN_LEFT:
+      if (g_isOverView && e->state == WLR_BUTTON_PRESSED)
+      {
+        dispatch_toggleoverview("internalToggle");
+        return;
+      }
+      break;
+    case BTN_RIGHT:
+      if (g_isOverView && e->state == WLR_BUTTON_PRESSED)
+      {
+        g_pHyprRenderer->damageWindow(g_pCompositor->m_pLastWindow);
+        g_pCompositor->closeWindow(g_pCompositor->m_pLastWindow);
+        return;
+      }
+      break;
+    }  
+  } else {
     (*(origCInputManager_onMouseButton)g_pCInputManager_onMouseButton->m_pOriginal)(thisptr, e);
-    return;
   }
-    
-  CWindow *pTargetWindow = g_pCompositor->windowFromCursor();
-  if(pTargetWindow && pTargetWindow != g_pCompositor->m_pLastWindow) {
-    g_pCompositor->focusWindow(pTargetWindow);
-  } else if(!pTargetWindow) {
-    return;
-  } 
-
-  switch (e->button)
-  {
-  case BTN_LEFT:
-    if (g_isOverView && e->state == WLR_BUTTON_PRESSED)
-    {
-      dispatch_toggleoverview("internalToggle");
-      return;
-    }
-    break;
-  case BTN_RIGHT:
-    if (g_isOverView && e->state == WLR_BUTTON_PRESSED)
-    {
-      g_pHyprRenderer->damageWindow(g_pCompositor->m_pLastWindow);
-      g_pCompositor->closeWindow(g_pCompositor->m_pLastWindow);
-      return;
-    }
-    break;
-  }  
-
-  (*(origCInputManager_onMouseButton)g_pCInputManager_onMouseButton->m_pOriginal)(thisptr, e);
-
 }
 
 static void hkOnWindowRemovedTiling(void* thisptr, CWindow *pWindow) {
