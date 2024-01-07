@@ -1,0 +1,15 @@
+[repository]
+name = "hycov"
+authors = ["DreamMaoMao"]
+commit_pins = [
+	["03ebbe18ed8517ee22591eac82cd54322f42cb7d", "a617009ca2149f11d0189c7eccc5210126dd05c3"]
+]
+
+[hycov]
+description = "hyprland overview mode"
+authors = ["DreamMaoMao"]
+output = "build/libhycov.so"
+build = [
+	"cmake -DCMAKE_BUILD_TYPE=Release -B build",
+	"cmake --build build"
+]
