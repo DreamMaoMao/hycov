@@ -184,11 +184,11 @@ void GridLayout::calculateWorkspace(const int &ws)
     */
     int m_x = pMonitor->vecPosition.x;
     int m_y = pMonitor->vecPosition.y;
-    int w_x = pMonitor->vecPosition.x;
-    int w_y = pMonitor->vecReservedTopLeft.y;
+    int w_x = pMonitor->vecPosition.x + pMonitor->vecReservedTopLeft.x;
+    int w_y = pMonitor->vecPosition.y + pMonitor->vecReservedTopLeft.y;
     int m_width = pMonitor->vecSize.x;
     int m_height = pMonitor->vecSize.y;
-    int w_width = pMonitor->vecSize.x;
+    int w_width = pMonitor->vecSize.x -  pMonitor->vecReservedTopLeft.x;
     int w_height = pMonitor->vecSize.y - pMonitor->vecReservedTopLeft.y;
 
     for (auto &node : m_lGridNodesData)
