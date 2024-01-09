@@ -286,6 +286,10 @@ void dispatch_toggleoverview(std::string arg)
 
 void dispatch_enteroverview(std::string arg)
 { 
+	if(g_isOverView) {
+		return;
+	}
+
 	if (arg == "forceall") {
 		g_forece_display_all = true;
 		hycov_log(LOG,"force display all clients");
@@ -370,6 +374,9 @@ void dispatch_enteroverview(std::string arg)
 
 void dispatch_leaveoverview(std::string arg)
 { 
+	if(!g_isOverView) {
+		return;
+	}
 	// get default layout
 	std::string *configLayoutName = &HyprlandAPI::getConfigValue(PHANDLE, "general:layout")->strValue;
 
@@ -507,8 +514,8 @@ void dispatch_leaveoverview(std::string arg)
 void registerDispatchers()
 {
 	g_forece_display_all = false;
-	// HyprlandAPI::addDispatcher(PHANDLE, "hycov:enteroverview", dispatch_enteroverview);
-	// HyprlandAPI::addDispatcher(PHANDLE, "hycov:leaveoverview", dispatch_leaveoverview);
+	HyprlandAPI::addDispatcher(PHANDLE, "hycov:enteroverview", dispatch_enteroverview);
+	HyprlandAPI::addDispatcher(PHANDLE, "hycov:leaveoverview", dispatch_leaveoverview);
 	HyprlandAPI::addDispatcher(PHANDLE, "hycov:toggleoverview", dispatch_toggleoverview);
 	HyprlandAPI::addDispatcher(PHANDLE, "hycov:movefocus", dispatch_focusdir);
 }
