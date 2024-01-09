@@ -183,6 +183,11 @@ such as `alt + tab`:
 }
 ```
 ## Frequently Asked Questions
+- some config not work, or the plugin not work.
+```
+if you use install hycov at first time,please try logout and relogin again.
+```
+
 - The numbers on the waybar are confused
 
 ```
