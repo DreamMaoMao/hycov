@@ -27,6 +27,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 	CONF("only_active_monitor", int, 0);
 	CONF("enable_alt_release_exit", int, 0);
 	CONF("alt_toggle_auto_next", int, 0);
+	CONF("click_in_cursor", int, 1);
 
 
 #undef CONF
@@ -44,6 +45,8 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 	static const auto *pOnly_active_monitor = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:only_active_monitor")->intValue;
 	static const auto *pEnable_alt_release_exit = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:enable_alt_release_exit")->intValue;
 	static const auto *pAlt_toggle_auto_next = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:alt_toggle_auto_next")->intValue;
+	static const auto *pClick_in_cursor = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:click_in_cursor")->intValue;
+
 
 	g_enable_hotarea = *pEnable_hotarea_config;
 	g_hotarea_size = *pHotarea_size_config;
@@ -58,6 +61,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 	g_only_active_monitor = *pOnly_active_monitor;
 	g_enable_alt_release_exit = *pEnable_alt_release_exit;
 	g_alt_toggle_auto_next = *pAlt_toggle_auto_next;
+	g_click_in_cursor = *pClick_in_cursor;
 
 	g_GridLayout = std::make_unique<GridLayout>();
 	HyprlandAPI::addLayout(PHANDLE, "grid", g_GridLayout.get());

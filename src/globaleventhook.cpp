@@ -113,11 +113,19 @@ static void mouseMoveHook(void *, SCallbackInfo &info, std::any data)
 static void hkCInputManager_onMouseButton(void* thisptr, wlr_pointer_button_event* e)
 {
   if(g_isOverView && (e->button == BTN_LEFT || e->button == BTN_RIGHT) ) {
+    CWindow *pTargetWindow;
+    CWindow *pClickWindow = g_pCompositor->windowFromCursor();
+    if(pClickWindow && pClickWindow != g_pCompositor->m_pLastWindow && g_click_in_cursor) {
+      g_pCompositor->focusWindow(pClickWindow);
+    } 
 
-    CWindow *pTargetWindow = g_pCompositor->windowFromCursor();
-    if(pTargetWindow && pTargetWindow != g_pCompositor->m_pLastWindow) {
-      g_pCompositor->focusWindow(pTargetWindow);
-    } else if(!pTargetWindow) {
+    if (g_click_in_cursor) {
+      pTargetWindow = pClickWindow;
+    } else {
+      pTargetWindow =  g_pCompositor->m_pLastWindow;
+    }
+
+    if(!pTargetWindow) {
       return;
     } 
 

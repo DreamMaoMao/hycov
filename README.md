@@ -77,6 +77,7 @@ plugin {
         only_active_monitor = 0 # only overview the active monitor
         enable_alt_release_exit = 0 # alt swith mode,see readme for detail
         alt_toggle_auto_next = 0 # auto focus next window when toggle overview in alt swith mode
+        click_in_cursor = 1 # target windwo is find by cursor, not the current foucus window.
     }
 }
 

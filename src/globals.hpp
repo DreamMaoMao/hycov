@@ -32,6 +32,7 @@ inline int g_only_active_workspace;
 inline int g_only_active_monitor;
 inline int g_enable_alt_release_exit;
 inline int g_alt_toggle_auto_next;
+inline int g_click_in_cursor;
 inline bool g_isOverViewExiting;
 inline bool g_forece_display_all;
 
