@@ -157,9 +157,7 @@ such as `alt + tab`:
                 hycov.packages.${pkgs.system}.hycov
               ];
               extraConfig = ''
-                bind = CTRL_ALT,h,hycov:enteroverview
-                bind = CTRL_ALT,m,hycov:leaveoverview
-                bind = CTRL_ALT,k,hycov:toggleoverview
+                bind = ALT,tab,hycov:toggleoverview
                 bind=ALT,left,hycov:movefocus,l
                 bind=ALT,right,hycov:movefocus,r
                 bind=ALT,up,hycov:movefocus,u
