@@ -39,7 +39,7 @@ inline bool g_forece_display_all;
 inline CFunctionHook* g_pOnSwipeBeginHook = nullptr;
 inline CFunctionHook* g_pOnSwipeEndHook = nullptr;
 inline CFunctionHook* g_pOnSwipeUpdateHook = nullptr;
-inline CFunctionHook* g_pOnWindowRemovedTilingHook = nullptr;
+inline CFunctionHook* g_pCWindow_onUnmap = nullptr;
 inline CFunctionHook* g_pChangeworkspaceHook = nullptr;
 inline CFunctionHook* g_pMoveActiveToWorkspaceHook = nullptr;
 inline CFunctionHook* g_pSpawnHook = nullptr;

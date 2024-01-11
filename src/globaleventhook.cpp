@@ -11,7 +11,7 @@
 typedef void (*origOnSwipeBegin)(void*, wlr_pointer_swipe_begin_event* e);
 typedef void (*origOnSwipeEnd)(void*, wlr_pointer_swipe_end_event* e);
 typedef void (*origOnSwipeUpdate)(void*, wlr_pointer_swipe_update_event* e);
-typedef void (*origOnWindowRemovedTiling)(void*, CWindow *pWindow);
+typedef void (*origCWindow_onUnmap)(void*);
 typedef void (*origStartAnim)(void*, bool in, bool left, bool instant);
 typedef void (*origFullscreenActive)(std::string args);
 typedef void (*origOnKeyboardKey)(void*, wlr_keyboard_key_event* e, SKeyboard* pKeyboard);
@@ -141,7 +141,6 @@ static void hkCInputManager_onMouseButton(void* thisptr, wlr_pointer_button_even
     case BTN_RIGHT:
       if (g_isOverView && e->state == WLR_BUTTON_PRESSED)
       {
-        g_pHyprRenderer->damageWindow(g_pCompositor->m_pLastWindow);
         g_pCompositor->closeWindow(g_pCompositor->m_pLastWindow);
         return;
       }
@@ -152,9 +151,10 @@ static void hkCInputManager_onMouseButton(void* thisptr, wlr_pointer_button_even
   }
 }
 
-static void hkOnWindowRemovedTiling(void* thisptr, CWindow *pWindow) {
+
+static void hkCWindow_onUnmap(void* thisptr) {
   // call the original function,Let it do what it should do
-  (*(origOnWindowRemovedTiling)g_pOnWindowRemovedTilingHook->m_pOriginal)(thisptr, pWindow);
+  (*(origCWindow_onUnmap)g_pCWindow_onUnmap->m_pOriginal)(thisptr);
 
   // after done original thing,The workspace automatically exit overview if no client exists 
   auto nodeNumInSameMonitor = 0;
@@ -285,7 +285,7 @@ void registerGlobalEventHook()
   g_pOnSwipeUpdateHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::onSwipeUpdate, (void*)&hkOnSwipeUpdate);
 
   // hook function of Gridlayout Remove a node from tiled list
-  g_pOnWindowRemovedTilingHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&GridLayout::onWindowRemovedTiling, (void*)&hkOnWindowRemovedTiling);
+  g_pCWindow_onUnmap = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CWindow::onUnmap, (void*)&hkCWindow_onUnmap);
 
   // hook function of workspace change animation start
   g_pStartAnimHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CWorkspace::startAnim, (void*)&hkStartAnim);
@@ -337,7 +337,7 @@ void registerGlobalEventHook()
 
   //if enable auto_exit, apply hook RemovedTiling function
   if(g_auto_exit){
-    g_pOnWindowRemovedTilingHook->hook();
+    g_pCWindow_onUnmap->hook();
   }
 
   //apply hook OnKeyboardKey function
