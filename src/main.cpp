@@ -28,6 +28,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 	CONF("enable_alt_release_exit", int, 0);
 	CONF("alt_toggle_auto_next", int, 0);
 	CONF("click_in_cursor", int, 1);
+	CONF("hight_of_titlebar", int, 0);
 
 
 #undef CONF
@@ -46,6 +47,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 	static const auto *pEnable_alt_release_exit = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:enable_alt_release_exit")->intValue;
 	static const auto *pAlt_toggle_auto_next = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:alt_toggle_auto_next")->intValue;
 	static const auto *pClick_in_cursor = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:click_in_cursor")->intValue;
+	static const auto *pHight_of_titlebar = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:hight_of_titlebar")->intValue;
 
 
 	g_enable_hotarea = *pEnable_hotarea_config;
@@ -62,6 +64,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 	g_enable_alt_release_exit = *pEnable_alt_release_exit;
 	g_alt_toggle_auto_next = *pAlt_toggle_auto_next;
 	g_click_in_cursor = *pClick_in_cursor;
+	g_hight_of_titlebar= *pHight_of_titlebar;
 
 	g_GridLayout = std::make_unique<GridLayout>();
 	HyprlandAPI::addLayout(PHANDLE, "grid", g_GridLayout.get());

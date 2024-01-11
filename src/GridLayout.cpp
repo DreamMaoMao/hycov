@@ -27,8 +27,8 @@ int GridLayout::getNodesNumOnWorkspace(const int &ws)
 }
 
 void GridLayout::resizeNodeSizePos(SGridNodeData *node, int x, int y, int width, int height)
-{
-    node->size = Vector2D(width, height);
+{   
+    node->size = Vector2D(width, height - g_hight_of_titlebar);
     node->position = Vector2D(x, y);
     applyNodeDataToWindow(node);
 }
