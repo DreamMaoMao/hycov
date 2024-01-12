@@ -25,20 +25,20 @@ because the plugin requires this [commit](https://github.com/hyprwm/Hyprland/com
 
 ##### using meson and ninja:
 
-```console
-$ git clone https://github.com/DreamMaoMao/hycov.git
-$ cd hycov
-$ sudo meson setup build --prefix=/usr
-$ sudo ninja -C build
-$ sudo ninja -C build install # `libhycov.so` path: /usr/lib/libhycov.so
+```shell
+git clone https://github.com/DreamMaoMao/hycov.git
+cd hycov
+sudo meson setup build --prefix=/usr
+sudo ninja -C build
+sudo ninja -C build install # `libhycov.so` path: /usr/lib/libhycov.so
 ```
 
 ##### using cmake:
 
-```console
-$ git clone https://github.com/DreamMaoMao/hycov.git
-$ cd hycov
-$ bash install.sh # `libhycov.so` path: /usr/lib/libhycov.so
+```shell
+git clone https://github.com/DreamMaoMao/hycov.git
+cd hycov
+bash install.sh # `libhycov.so` path: /usr/lib/libhycov.so
 ```
 
 ### Usage (hyprland.conf)
