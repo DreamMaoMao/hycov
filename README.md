@@ -4,7 +4,7 @@ hyprland overview mode plugin,a new tile window workflow
 ### what can it do:
 - Tile all workspace windows in one workspace by grid layout
 
-- Support restore size and position of floating & fullscreen window
+- After quit the overview mode, it can perfect recovery window state (fullscreen, floating, the size, position)
 
 - Support a variety of trigger methods, touch pad gestures, mouse screen hot area, shortcut keys
 
@@ -19,8 +19,11 @@ Anyone is welcome to fork. If you end up improving the plugin, please let me kno
 
 ### Manual Installation
 
-_Only supports hyprland source code after 2023-10-22,
+##### something need to notice
+1.You need to manually relogin after it is installed. 
+after the installation is complete, it may also trigger logout if you do not logout which is normal.
 
+2.Only supports hyprland source code after 2023-10-22.
 because the plugin requires this [commit](https://github.com/hyprwm/Hyprland/commit/a61eb7694df25a75f45502ed64b1536fda370c1d) in hyprland(was commited in 2023-10-21)
 
 ##### using meson and ninja:
