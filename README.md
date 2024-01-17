@@ -111,6 +111,9 @@ https://github.com/DreamMaoMao/hycov/assets/30348075/15ba36c2-1782-4ae0-8ac1-d0c
 
 
 # Alt switch mode
+<details>
+<summary>Alt switch mode details</summary>
+
 ```conf
 enable_alt_release_exit = 1
 alt_replace_key = Alt_L # If your mainkey of toggleoverview is ALt, you can ignore it
@@ -128,6 +131,9 @@ such as `alt + tab`:
 
 ## If your mainkey that triggers toggleoverview is not `alt`, you need to use `alt_replace_key` to specify what is the detection key on release.
 
+<details>
+<summary>alt_replace_key details</summary>
+
 - use keyname
 ```conf
 alt_replace_key = Alt_L # Alt_L,Alt_R,Super_L,Super_R,Control_L,Control_R,Shift_L,Shift_R
@@ -137,6 +143,8 @@ alt_replace_key = Alt_L # Alt_L,Alt_R,Super_L,Super_R,Control_L,Control_R,Shift_
 ```conf
 alt_replace_key = code:64 # use `xev` command to get keycode
 ```
+</details>
+</details>
 
 ### NixOS with home—manager
 
