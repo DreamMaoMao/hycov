@@ -78,10 +78,12 @@ plugin {
         auto_fullscreen = 0 # auto make active window maximize after exit overview
         only_active_workspace = 0 # only overview the active workspace
         only_active_monitor = 0 # only overview the active monitor
-        enable_alt_release_exit = 0 # alt swith mode,see readme for detail
+        enable_alt_release_exit = 0 # alt swith mode arg,see readme for detail
+        alt_replace_key = Alt_L # alt swith mode arg,see readme for detail
         alt_toggle_auto_next = 0 # auto focus next window when toggle overview in alt swith mode
         click_in_cursor = 1 # target windwo is find by cursor, not the current foucus window.
         hight_of_titlebar = 0 # height deviation of title bar hight
+
     }
 }
 
@@ -108,12 +110,13 @@ https://github.com/DreamMaoMao/hycov/assets/30348075/15ba36c2-1782-4ae0-8ac1-d0c
 ![image](https://github.com/DreamMaoMao/hycov/assets/30348075/500d9fd7-299b-48bc-ab72-146f263044a5)
 
 
-# alt switch mode
-```
+# Alt switch mode
+```conf
 enable_alt_release_exit = 1
+alt_replace_key = Alt_L # If your mainkey of toggleoverview is ALt, you can ignore it
+alt_toggle_auto_next = 0 # auto focus next window when enter overview in alt mode
 ```
-if you enable this mode , you will just allow to use `alt + otherkey` to bind toggleoverview.
-
+## operation
 such as `alt + tab`:
 
 - 1.`alt + tab` will enter overview when you not in overview(please hold alt,don't make it release)
@@ -121,6 +124,19 @@ such as `alt + tab`:
 - 2.`alt + tab` will switch window focus circularly when you in overview. (please hold alt,don't make it release)
 
 - 3.when you release `alt` , it will auto exit overview.
+
+
+## If your mainkey that triggers toggleoverview is not `alt`, you need to use `alt_replace_key` to specify what is the detection key on release.
+
+- use keyname
+```conf
+alt_replace_key = Alt_L # Alt_L,Alt_R,Super_L,Super_R,Control_L,Control_R,Shift_L,Shift_R
+```
+
+- use keycode
+```conf
+alt_replace_key = code:64 # use `xev` command to get keycode
+```
 
 ### NixOS with home—manager
 
