@@ -135,7 +135,7 @@ alt_replace_key = Alt_L # Alt_L,Alt_R,Super_L,Super_R,Control_L,Control_R,Shift_
 
 - use keycode
 ```conf
-alt_replace_key = code:56 # use `xev` command to get keycode
+alt_replace_key = code:64 # use `xev` command to get keycode
 ```
 
 ### NixOS with home—manager
