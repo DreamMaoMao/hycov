@@ -140,22 +140,19 @@ such as `alt + tab`:
 <summary> If you don't want to use `alt` as MainKey in alt mode</summary>
 
 such as use `super` to repalce `alt`
-
 - 1.bind toggleoverview
 ```
 bind = SUPER,tab,hycov:toggleoverview
 ```
 - 2.use `alt_replace_key` to specify what is the detection key on release.
-
-use keyname
-```conf
-alt_replace_key = Super_L # Alt_L,Alt_R,Super_L,Super_R,Control_L,Control_R,Shift_L,Shift_R
 ```
+# use keyname
+alt_replace_key = Super_L # Alt_L,Alt_R,Super_L,Super_R,Control_L,Control_R,Shift_L,Shift_R
 
-use keycode
-```conf
+# use keycode
 alt_replace_key = code:133 # use `xev` command to get keycode
 ```
+
 </details>
 
 ### NixOS with home—manager
