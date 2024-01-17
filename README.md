@@ -96,8 +96,13 @@ windowrulev2 = bordercolor rgb(158833),fullscreen:1 # set bordercolor to green i
 # toggle fullscreen maximize
 bind = ALT,a,fullscreen,1
 ```
+<details>
+<summary>detail video</summary>
 
 https://github.com/DreamMaoMao/hycov/assets/30348075/15ba36c2-1782-4ae0-8ac1-d0ca98e01e0f
+
+</details>
+
 
 - if you use the `hyprland/workspaces` module in waybar,you should change field {id} to {name}. It will let you know you are in overview mode.
 ```
@@ -106,18 +111,21 @@ https://github.com/DreamMaoMao/hycov/assets/30348075/15ba36c2-1782-4ae0-8ac1-d0c
     "on-click":"activate",
 },
 ```
+
+<details>
+<summary>detail picture</summary>
+
 ![image](https://github.com/DreamMaoMao/hycov/assets/30348075/332f4025-20c1-4a44-853b-1b5264df986e)
 ![image](https://github.com/DreamMaoMao/hycov/assets/30348075/500d9fd7-299b-48bc-ab72-146f263044a5)
 
+</details>
+
 
 # Alt switch mode
-<details>
-<summary>Alt switch mode details</summary>
-
 ```conf
 enable_alt_release_exit = 1
-alt_replace_key = Alt_L # If your mainkey of toggleoverview is ALt, you can ignore it
 alt_toggle_auto_next = 0 # auto focus next window when enter overview in alt mode
+# alt_replace_key = Alt_L # If your MainKey of toggleoverview is ALt, you can ignore it
 ```
 ## operation
 such as `alt + tab`:
@@ -128,22 +136,26 @@ such as `alt + tab`:
 
 - 3.when you release `alt` , it will auto exit overview.
 
-
-## If your mainkey that triggers toggleoverview is not `alt`, you need to use `alt_replace_key` to specify what is the detection key on release.
-
 <details>
-<summary>alt_replace_key details</summary>
+<summary> If you don't want to use `alt` as MainKey in alt mode</summary>
 
-- use keyname
+such as use `super` to repalce `alt`
+
+- 1.bind toggleoverview
+```
+bind = SUPER,tab,hycov:toggleoverview
+```
+- 2.use `alt_replace_key` to specify what is the detection key on release.
+
+use keyname
 ```conf
-alt_replace_key = Alt_L # Alt_L,Alt_R,Super_L,Super_R,Control_L,Control_R,Shift_L,Shift_R
+alt_replace_key = Super_L # Alt_L,Alt_R,Super_L,Super_R,Control_L,Control_R,Shift_L,Shift_R
 ```
 
-- use keycode
+use keycode
 ```conf
-alt_replace_key = code:64 # use `xev` command to get keycode
+alt_replace_key = code:133 # use `xev` command to get keycode
 ```
-</details>
 </details>
 
 ### NixOS with home—manager
