@@ -109,24 +109,29 @@ static void toggle_hotarea(int x_root, int y_root)
   CMonitor *pMonitor = g_pCompositor->m_pLastMonitor;
   std::string arg = "";
 
+  if (g_hotarea_monitor != "all" && pMonitor->szName != g_hotarea_monitor)
+    return;
+
   auto m_x = pMonitor->vecPosition.x;
   auto m_y = pMonitor->vecPosition.y;
+  auto m_width = pMonitor->vecSize.x;
   auto m_height = pMonitor->vecSize.y;
 
-  int hx = m_x + g_hotarea_size;
-  int hy = m_y + m_height - g_hotarea_size;
-
-  if (!g_isInHotArea && y_root > hy &&
-      x_root < hx && x_root >= m_x &&
-      y_root <= (m_y + m_height))
+  if (!g_isInHotArea &&
+    ((g_hotarea_pos == 1 && x_root < (m_x + g_hotarea_size) && y_root < (m_y + g_hotarea_size)) ||
+    (g_hotarea_pos == 2 && x_root > (m_x + m_width - g_hotarea_size) && y_root < (m_y + g_hotarea_size)) ||
+    (g_hotarea_pos == 3 && x_root < (m_x + g_hotarea_size) && y_root > (m_y + m_height - g_hotarea_size)) ||
+    (g_hotarea_pos == 4 && x_root > (m_x + m_width - g_hotarea_size) && y_root > (m_y + m_height - g_hotarea_size))))
   {
     hycov_log(LOG,"cursor enter hotarea");
     dispatch_toggleoverview("internalToggle");
     g_isInHotArea = true;
   }
   else if (g_isInHotArea &&
-           (y_root <= hy || x_root >= hx || x_root < m_x ||
-            y_root > (m_y + m_height)))
+    !((g_hotarea_pos == 1 && x_root < (m_x + g_hotarea_size) && y_root < (m_y + g_hotarea_size)) ||
+    (g_hotarea_pos == 2 && x_root > (m_x + m_width - g_hotarea_size) && y_root < (m_y + g_hotarea_size)) ||
+    (g_hotarea_pos == 3 && x_root < (m_x + g_hotarea_size) && y_root > (m_y + m_height - g_hotarea_size)) ||
+    (g_hotarea_pos == 4 && x_root > (m_x + m_width - g_hotarea_size) && y_root > (m_y + m_height - g_hotarea_size))))
   {
     if(g_isInHotArea)
       g_isInHotArea = false;
