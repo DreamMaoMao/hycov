@@ -67,8 +67,10 @@ plugin {
     hycov {
         overview_gappo = 60 # gaps width from screen edge
         overview_gappi = 24 # gaps width from clients
-        hotarea_size = 10 # hotarea size in bottom left,10x10
         enable_hotarea = 1 # enable mouse cursor hotarea     
+        hotarea_monitor = all # monitor name which hotarea is in, default is all
+        hotarea_pos = 1 # position of hotarea (1: bottom left, 2: bottom right, 3: top left, 4: top right)
+        hotarea_size = 10 # hotarea size, 10x10
         swipe_fingers = 4 # finger number of gesture,move any directory
         move_focus_distance = 100 # distance for movefocus,only can use 3 finger to move 
         enable_gesture = 0 # enable gesture
