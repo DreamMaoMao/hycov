@@ -107,7 +107,6 @@ static void hkOnSwipeEnd(void* thisptr, wlr_pointer_swipe_end_event* e) {
 static void toggle_hotarea(int x_root, int y_root)
 {
   CMonitor *pMonitor = g_pCompositor->m_pLastMonitor;
-  std::string arg = "";
 
   if (g_hotarea_monitor != "all" && pMonitor->szName != g_hotarea_monitor)
     return;
@@ -118,20 +117,20 @@ static void toggle_hotarea(int x_root, int y_root)
   auto m_height = pMonitor->vecSize.y;
 
   if (!g_isInHotArea &&
-    ((g_hotarea_pos == 1 && x_root < (m_x + g_hotarea_size) && y_root < (m_y + g_hotarea_size)) ||
-    (g_hotarea_pos == 2 && x_root > (m_x + m_width - g_hotarea_size) && y_root < (m_y + g_hotarea_size)) ||
-    (g_hotarea_pos == 3 && x_root < (m_x + g_hotarea_size) && y_root > (m_y + m_height - g_hotarea_size)) ||
-    (g_hotarea_pos == 4 && x_root > (m_x + m_width - g_hotarea_size) && y_root > (m_y + m_height - g_hotarea_size))))
+    ((g_hotarea_pos == 1 && x_root < (m_x + g_hotarea_size) && y_root > (m_y + m_height - g_hotarea_size)) ||
+    (g_hotarea_pos == 2 && x_root > (m_x + m_width - g_hotarea_size) && y_root > (m_y + m_height - g_hotarea_size)) ||
+    (g_hotarea_pos == 3 && x_root < (m_x + g_hotarea_size) && y_root < (m_y + g_hotarea_size)) ||
+    (g_hotarea_pos == 4 && x_root > (m_x + m_width - g_hotarea_size) && y_root < (m_y + g_hotarea_size))))
   {
     hycov_log(LOG,"cursor enter hotarea");
     dispatch_toggleoverview("internalToggle");
     g_isInHotArea = true;
   }
   else if (g_isInHotArea &&
-    !((g_hotarea_pos == 1 && x_root < (m_x + g_hotarea_size) && y_root < (m_y + g_hotarea_size)) ||
-    (g_hotarea_pos == 2 && x_root > (m_x + m_width - g_hotarea_size) && y_root < (m_y + g_hotarea_size)) ||
-    (g_hotarea_pos == 3 && x_root < (m_x + g_hotarea_size) && y_root > (m_y + m_height - g_hotarea_size)) ||
-    (g_hotarea_pos == 4 && x_root > (m_x + m_width - g_hotarea_size) && y_root > (m_y + m_height - g_hotarea_size))))
+    !((g_hotarea_pos == 1 && x_root < (m_x + g_hotarea_size) && y_root > (m_y + m_height - g_hotarea_size)) ||
+    (g_hotarea_pos == 2 && x_root > (m_x + m_width - g_hotarea_size) && y_root > (m_y + m_height - g_hotarea_size)) ||
+    (g_hotarea_pos == 3 && x_root < (m_x + g_hotarea_size) && y_root < (m_y + g_hotarea_size)) ||
+    (g_hotarea_pos == 4 && x_root > (m_x + m_width - g_hotarea_size) && y_root < (m_y + g_hotarea_size))))
   {
     if(g_isInHotArea)
       g_isInHotArea = false;
