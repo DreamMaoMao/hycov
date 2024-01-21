@@ -33,16 +33,16 @@ std::string getKeynameFromKeycode(wlr_keyboard_key_event* e, SKeyboard* pKeyboar
 }
 
 bool isKeyReleaseToggleExitOverviewHit(wlr_keyboard_key_event* e, SKeyboard* pKeyboard) {
-  if (g_alt_replace_key == "")
+  if (g_hycov_alt_replace_key == "")
     return false;
 
-  if (isNumber(g_alt_replace_key) && std::stoi(g_alt_replace_key) > 9 && std::stoi(g_alt_replace_key) == (e->keycode + 8)) {
+  if (isNumber(g_hycov_alt_replace_key) && std::stoi(g_hycov_alt_replace_key) > 9 && std::stoi(g_hycov_alt_replace_key) == (e->keycode + 8)) {
     return true;
-  } else if (g_alt_replace_key.find("code:") == 0 && isNumber(g_alt_replace_key.substr(5)) && std::stoi(g_alt_replace_key.substr(5)) == (e->keycode + 8)) {
+  } else if (g_hycov_alt_replace_key.find("code:") == 0 && isNumber(g_hycov_alt_replace_key.substr(5)) && std::stoi(g_hycov_alt_replace_key.substr(5)) == (e->keycode + 8)) {
     return true;
   } else {
     std::string keyname = getKeynameFromKeycode(e,pKeyboard);
-    if (keyname == g_alt_replace_key) {
+    if (keyname == g_hycov_alt_replace_key) {
       return true;
     }
   }
@@ -51,22 +51,22 @@ bool isKeyReleaseToggleExitOverviewHit(wlr_keyboard_key_event* e, SKeyboard* pKe
 }
 
 static void hkOnSwipeUpdate(void* thisptr, wlr_pointer_swipe_update_event* e) {
-  if(g_isOverView){
+  if(g_hycov_isOverView){
     gesture_dx = gesture_dx + e->dx;
     gesture_dy = gesture_dy + e->dy;
-    if(e->dx > 0 && gesture_dx - gesture_previous_dx > g_move_focus_distance){
+    if(e->dx > 0 && gesture_dx - gesture_previous_dx > g_hycov_move_focus_distance){
       dispatch_focusdir("r");
       gesture_previous_dx = gesture_dx;
       hycov_log(LOG,"OnSwipeUpdate hook focus right");
-    } else if(e->dx < 0 && gesture_previous_dx - gesture_dx > g_move_focus_distance){
+    } else if(e->dx < 0 && gesture_previous_dx - gesture_dx > g_hycov_move_focus_distance){
       dispatch_focusdir("l");
       gesture_previous_dx = gesture_dx;
       hycov_log(LOG,"OnSwipeUpdate hook focus left");
-    } else if(e->dy > 0 && gesture_dy - gesture_previous_dy > g_move_focus_distance){
+    } else if(e->dy > 0 && gesture_dy - gesture_previous_dy > g_hycov_move_focus_distance){
       dispatch_focusdir("d");
       gesture_previous_dy = gesture_dy;
       hycov_log(LOG,"OnSwipeUpdate hook focus down");
-    } else if(e->dy < 0 && gesture_previous_dy - gesture_dy > g_move_focus_distance){
+    } else if(e->dy < 0 && gesture_previous_dy - gesture_dy > g_hycov_move_focus_distance){
       dispatch_focusdir("u");
       gesture_previous_dy = gesture_dy;
       hycov_log(LOG,"OnSwipeUpdate hook focus up");
@@ -74,18 +74,18 @@ static void hkOnSwipeUpdate(void* thisptr, wlr_pointer_swipe_update_event* e) {
     return;
   }
   // call the original function,Let it do what it should do
-  (*(origOnSwipeUpdate)g_pOnSwipeUpdateHook->m_pOriginal)(thisptr, e);
+  (*(origOnSwipeUpdate)g_hycov_pOnSwipeUpdateHook->m_pOriginal)(thisptr, e);
 }
 
 static void hkOnSwipeBegin(void* thisptr, wlr_pointer_swipe_begin_event* e) {
-  if(e->fingers == g_swipe_fingers){
-    g_isGestureBegin = true;
+  if(e->fingers == g_hycov_swipe_fingers){
+    g_hycov_isGestureBegin = true;
     return;
   } 
   hycov_log(LOG,"OnSwipeBegin hook toggle");
 
   // call the original function,Let it do what it should do
-  (*(origOnSwipeBegin)g_pOnSwipeBeginHook->m_pOriginal)(thisptr, e);
+  (*(origOnSwipeBegin)g_hycov_pOnSwipeBeginHook->m_pOriginal)(thisptr, e);
 }
 
 static void hkOnSwipeEnd(void* thisptr, wlr_pointer_swipe_end_event* e) {
@@ -94,21 +94,21 @@ static void hkOnSwipeEnd(void* thisptr, wlr_pointer_swipe_end_event* e) {
   gesture_dy = 0;
   gesture_previous_dy = 0;
   
-  if(g_isGestureBegin){
-    g_isGestureBegin = false;
+  if(g_hycov_isGestureBegin){
+    g_hycov_isGestureBegin = false;
     dispatch_toggleoverview("internalToggle");
     return;
   }
   hycov_log(LOG,"OnSwipeEnd hook toggle");
   // call the original function,Let it do what it should do
-  (*(origOnSwipeEnd)g_pOnSwipeEndHook->m_pOriginal)(thisptr, e);
+  (*(origOnSwipeEnd)g_hycov_pOnSwipeEndHook->m_pOriginal)(thisptr, e);
 }
 
 static void toggle_hotarea(int x_root, int y_root)
 {
   CMonitor *pMonitor = g_pCompositor->m_pLastMonitor;
 
-  if (g_hotarea_monitor != "all" && pMonitor->szName != g_hotarea_monitor)
+  if (g_hycov_hotarea_monitor != "all" && pMonitor->szName != g_hycov_hotarea_monitor)
     return;
 
   auto m_x = pMonitor->vecPosition.x;
@@ -116,24 +116,24 @@ static void toggle_hotarea(int x_root, int y_root)
   auto m_width = pMonitor->vecSize.x;
   auto m_height = pMonitor->vecSize.y;
 
-  if (!g_isInHotArea &&
-    ((g_hotarea_pos == 1 && x_root < (m_x + g_hotarea_size) && y_root > (m_y + m_height - g_hotarea_size)) ||
-    (g_hotarea_pos == 2 && x_root > (m_x + m_width - g_hotarea_size) && y_root > (m_y + m_height - g_hotarea_size)) ||
-    (g_hotarea_pos == 3 && x_root < (m_x + g_hotarea_size) && y_root < (m_y + g_hotarea_size)) ||
-    (g_hotarea_pos == 4 && x_root > (m_x + m_width - g_hotarea_size) && y_root < (m_y + g_hotarea_size))))
+  if (!g_hycov_isInHotArea &&
+    ((g_hycov_hotarea_pos == 1 && x_root < (m_x + g_hycov_hotarea_size) && y_root > (m_y + m_height - g_hycov_hotarea_size)) ||
+    (g_hycov_hotarea_pos == 2 && x_root > (m_x + m_width - g_hycov_hotarea_size) && y_root > (m_y + m_height - g_hycov_hotarea_size)) ||
+    (g_hycov_hotarea_pos == 3 && x_root < (m_x + g_hycov_hotarea_size) && y_root < (m_y + g_hycov_hotarea_size)) ||
+    (g_hycov_hotarea_pos == 4 && x_root > (m_x + m_width - g_hycov_hotarea_size) && y_root < (m_y + g_hycov_hotarea_size))))
   {
     hycov_log(LOG,"cursor enter hotarea");
     dispatch_toggleoverview("internalToggle");
-    g_isInHotArea = true;
+    g_hycov_isInHotArea = true;
   }
-  else if (g_isInHotArea &&
-    !((g_hotarea_pos == 1 && x_root < (m_x + g_hotarea_size) && y_root > (m_y + m_height - g_hotarea_size)) ||
-    (g_hotarea_pos == 2 && x_root > (m_x + m_width - g_hotarea_size) && y_root > (m_y + m_height - g_hotarea_size)) ||
-    (g_hotarea_pos == 3 && x_root < (m_x + g_hotarea_size) && y_root < (m_y + g_hotarea_size)) ||
-    (g_hotarea_pos == 4 && x_root > (m_x + m_width - g_hotarea_size) && y_root < (m_y + g_hotarea_size))))
+  else if (g_hycov_isInHotArea &&
+    !((g_hycov_hotarea_pos == 1 && x_root < (m_x + g_hycov_hotarea_size) && y_root > (m_y + m_height - g_hycov_hotarea_size)) ||
+    (g_hycov_hotarea_pos == 2 && x_root > (m_x + m_width - g_hycov_hotarea_size) && y_root > (m_y + m_height - g_hycov_hotarea_size)) ||
+    (g_hycov_hotarea_pos == 3 && x_root < (m_x + g_hycov_hotarea_size) && y_root < (m_y + g_hycov_hotarea_size)) ||
+    (g_hycov_hotarea_pos == 4 && x_root > (m_x + m_width - g_hycov_hotarea_size) && y_root < (m_y + g_hycov_hotarea_size))))
   {
-    if(g_isInHotArea)
-      g_isInHotArea = false;
+    if(g_hycov_isInHotArea)
+      g_hycov_isInHotArea = false;
   }
 }
 
@@ -145,14 +145,14 @@ static void mouseMoveHook(void *, SCallbackInfo &info, std::any data)
 
 static void hkCInputManager_onMouseButton(void* thisptr, wlr_pointer_button_event* e)
 {
-  if(g_isOverView && (e->button == BTN_LEFT || e->button == BTN_RIGHT) ) {
+  if(g_hycov_isOverView && (e->button == BTN_LEFT || e->button == BTN_RIGHT) ) {
     CWindow *pTargetWindow;
     CWindow *pClickWindow = g_pCompositor->windowFromCursor();
-    if(pClickWindow && pClickWindow != g_pCompositor->m_pLastWindow && g_click_in_cursor) {
+    if(pClickWindow && pClickWindow != g_pCompositor->m_pLastWindow && g_hycov_click_in_cursor) {
       g_pCompositor->focusWindow(pClickWindow);
     } 
 
-    if (g_click_in_cursor) {
+    if (g_hycov_click_in_cursor) {
       pTargetWindow = pClickWindow;
     } else {
       pTargetWindow =  g_pCompositor->m_pLastWindow;
@@ -165,14 +165,14 @@ static void hkCInputManager_onMouseButton(void* thisptr, wlr_pointer_button_even
     switch (e->button)
     {
     case BTN_LEFT:
-      if (g_isOverView && e->state == WLR_BUTTON_PRESSED)
+      if (g_hycov_isOverView && e->state == WLR_BUTTON_PRESSED)
       {
         dispatch_toggleoverview("internalToggle");
         return;
       }
       break;
     case BTN_RIGHT:
-      if (g_isOverView && e->state == WLR_BUTTON_PRESSED)
+      if (g_hycov_isOverView && e->state == WLR_BUTTON_PRESSED)
       {
         g_pCompositor->closeWindow(g_pCompositor->m_pLastWindow);
         return;
@@ -180,19 +180,19 @@ static void hkCInputManager_onMouseButton(void* thisptr, wlr_pointer_button_even
       break;
     }  
   } else {
-    (*(origCInputManager_onMouseButton)g_pCInputManager_onMouseButton->m_pOriginal)(thisptr, e);
+    (*(origCInputManager_onMouseButton)g_hycov_pCInputManager_onMouseButton->m_pOriginal)(thisptr, e);
   }
 }
 
 
 static void hkCWindow_onUnmap(void* thisptr) {
   // call the original function,Let it do what it should do
-  (*(origCWindow_onUnmap)g_pCWindow_onUnmap->m_pOriginal)(thisptr);
+  (*(origCWindow_onUnmap)g_hycov_pCWindow_onUnmap->m_pOriginal)(thisptr);
 
   // after done original thing,The workspace automatically exit overview if no client exists 
   auto nodeNumInSameMonitor = 0;
   auto nodeNumInSameWorkspace = 0;
-	for (auto &n : g_GridLayout->m_lGridNodesData) {
+	for (auto &n : g_hycov_GridLayout->m_lGridNodesData) {
 		if(n.pWindow->m_iMonitorID == g_pCompositor->m_pLastMonitor->ID) {
 			nodeNumInSameMonitor++;
 		}
@@ -201,13 +201,13 @@ static void hkCWindow_onUnmap(void* thisptr) {
 		}
 	}
 
-  if (g_isOverView && nodeNumInSameMonitor == 0) {
+  if (g_hycov_isOverView && nodeNumInSameMonitor == 0) {
     hycov_log(LOG,"no tiling window in same monitor,auto exit overview");
     dispatch_leaveoverview("");
     return;
   }
 
-  if (g_isOverView && nodeNumInSameWorkspace == 0 && g_only_active_workspace) {
+  if (g_hycov_isOverView && nodeNumInSameWorkspace == 0 && g_hycov_only_active_workspace) {
     hycov_log(LOG,"no tiling windwo in same workspace,auto exit overview");
     dispatch_leaveoverview("");
     return;
@@ -232,20 +232,20 @@ static void hkSpawn(std::string args) {
 
 static void hkStartAnim(void* thisptr,bool in, bool left, bool instant = false) {
   // if is exiting overview, omit the animation of workspace change (instant = true)
-  if (g_isOverViewExiting) {
-    (*(origStartAnim)g_pStartAnimHook->m_pOriginal)(thisptr, in, left, true);
-    hycov_log(LOG,"hook startAnim,disable workspace change anim,in:{},isOverview:{}",in,g_isOverView);
+  if (g_hycov_isOverViewExiting) {
+    (*(origStartAnim)g_hycov_pStartAnimHook->m_pOriginal)(thisptr, in, left, true);
+    hycov_log(LOG,"hook startAnim,disable workspace change anim,in:{},isOverview:{}",in,g_hycov_isOverView);
   } else {
-    (*(origStartAnim)g_pStartAnimHook->m_pOriginal)(thisptr, in, left, instant);
-    hycov_log(LOG,"hook startAnim,enable workspace change anim,in:{},isOverview:{}",in,g_isOverView);
+    (*(origStartAnim)g_hycov_pStartAnimHook->m_pOriginal)(thisptr, in, left, instant);
+    hycov_log(LOG,"hook startAnim,enable workspace change anim,in:{},isOverview:{}",in,g_hycov_isOverView);
   }
 }
 
 static void hkOnKeyboardKey(void* thisptr,wlr_keyboard_key_event* e, SKeyboard* pKeyboard) {
 
-  (*(origOnKeyboardKey)g_pOnKeyboardKeyHook->m_pOriginal)(thisptr, e, pKeyboard);
+  (*(origOnKeyboardKey)g_hycov_pOnKeyboardKeyHook->m_pOriginal)(thisptr, e, pKeyboard);
   // hycov_log(LOG,"alt key,keycode:{}",e->keycode);
-  if(g_enable_alt_release_exit && g_isOverView && e->state == WL_KEYBOARD_KEY_STATE_RELEASED) {
+  if(g_hycov_enable_alt_release_exit && g_hycov_isOverView && e->state == WL_KEYBOARD_KEY_STATE_RELEASED) {
     if (!isKeyReleaseToggleExitOverviewHit(e,pKeyboard))
       return;
     dispatch_leaveoverview("");
@@ -258,7 +258,7 @@ static void hkFullscreenActive(std::string args) {
   // auto exit overview and fullscreen window when toggle fullscreen in overview mode
   hycov_log(LOG,"FullscreenActive hook toggle");
 
-  // (*(origFullscreenActive)g_pFullscreenActiveHook->m_pOriginal)(args);
+  // (*(origFullscreenActive)g_hycov_pFullscreenActiveHook->m_pOriginal)(args);
   const auto pWindow = g_pCompositor->m_pLastWindow;
 
   if (!pWindow)
@@ -267,11 +267,11 @@ static void hkFullscreenActive(std::string args) {
   if (g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID))
         return;
 
-  if (g_isOverView && want_auto_fullscren(pWindow) && !g_auto_fullscreen) {
+  if (g_hycov_isOverView && want_auto_fullscren(pWindow) && !g_hycov_auto_fullscreen) {
     hycov_log(LOG,"FullscreenActive toggle leave overview with fullscreen");
     dispatch_toggleoverview("internalToggle");
     g_pCompositor->setWindowFullscreen(pWindow, !pWindow->m_bIsFullscreen, args == "1" ? FULLSCREEN_MAXIMIZED : FULLSCREEN_FULL);
-  } else if (g_isOverView && (!want_auto_fullscren(pWindow) || g_auto_fullscreen)) {
+  } else if (g_hycov_isOverView && (!want_auto_fullscren(pWindow) || g_hycov_auto_fullscreen)) {
     hycov_log(LOG,"FullscreenActive toggle leave overview without fullscreen");
     dispatch_toggleoverview("internalToggle");
   } else {
@@ -300,10 +300,10 @@ void hkSDwindleNodeData_recalcSizePosRecursive(void* thisptr,bool force, bool ho
 
 void registerGlobalEventHook()
 {
-  g_isInHotArea = false;
-  g_isGestureBegin = false;
-  g_isOverView = false;
-  g_isOverViewExiting = false;
+  g_hycov_isInHotArea = false;
+  g_hycov_isGestureBegin = false;
+  g_hycov_isOverView = false;
+  g_hycov_isOverViewExiting = false;
   gesture_dx = 0;
   gesture_dy = 0;
   gesture_previous_dx = 0;
@@ -315,72 +315,72 @@ void registerGlobalEventHook()
   //create public function hook
 
   // hook function of Swipe gesture event handle 
-  g_pOnSwipeBeginHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::onSwipeBegin, (void*)&hkOnSwipeBegin);
-  g_pOnSwipeEndHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::onSwipeEnd, (void*)&hkOnSwipeEnd);
-  g_pOnSwipeUpdateHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::onSwipeUpdate, (void*)&hkOnSwipeUpdate);
+  g_hycov_pOnSwipeBeginHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::onSwipeBegin, (void*)&hkOnSwipeBegin);
+  g_hycov_pOnSwipeEndHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::onSwipeEnd, (void*)&hkOnSwipeEnd);
+  g_hycov_pOnSwipeUpdateHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::onSwipeUpdate, (void*)&hkOnSwipeUpdate);
 
   // hook function of Gridlayout Remove a node from tiled list
-  g_pCWindow_onUnmap = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CWindow::onUnmap, (void*)&hkCWindow_onUnmap);
+  g_hycov_pCWindow_onUnmap = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CWindow::onUnmap, (void*)&hkCWindow_onUnmap);
 
   // hook function of workspace change animation start
-  g_pStartAnimHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CWorkspace::startAnim, (void*)&hkStartAnim);
-  g_pStartAnimHook->hook();
+  g_hycov_pStartAnimHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CWorkspace::startAnim, (void*)&hkStartAnim);
+  g_hycov_pStartAnimHook->hook();
 
   //  hook function of keypress
-  g_pOnKeyboardKeyHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::onKeyboardKey, (void*)&hkOnKeyboardKey);
+  g_hycov_pOnKeyboardKeyHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::onKeyboardKey, (void*)&hkOnKeyboardKey);
 
   // layotu reculate
-  g_pHyprDwindleLayout_recalculateMonitor = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CHyprDwindleLayout::recalculateMonitor, (void*)&hkHyprDwindleLayout_recalculateMonitor);
-  g_pHyprMasterLayout_recalculateMonitor = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CHyprMasterLayout::recalculateMonitor, (void*)&hkHyprMasterLayout_recalculateMonitor);
-  g_pHyprDwindleLayout_recalculateWindow = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CHyprDwindleLayout::recalculateWindow, (void*)&hkHyprDwindleLayout_recalculateWindow);
-  g_pSDwindleNodeData_recalcSizePosRecursive = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&SDwindleNodeData::recalcSizePosRecursive, (void*)&hkSDwindleNodeData_recalcSizePosRecursive);
+  g_hycov_pHyprDwindleLayout_recalculateMonitor = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CHyprDwindleLayout::recalculateMonitor, (void*)&hkHyprDwindleLayout_recalculateMonitor);
+  g_hycov_pHyprMasterLayout_recalculateMonitor = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CHyprMasterLayout::recalculateMonitor, (void*)&hkHyprMasterLayout_recalculateMonitor);
+  g_hycov_pHyprDwindleLayout_recalculateWindow = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CHyprDwindleLayout::recalculateWindow, (void*)&hkHyprDwindleLayout_recalculateWindow);
+  g_hycov_pSDwindleNodeData_recalcSizePosRecursive = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&SDwindleNodeData::recalcSizePosRecursive, (void*)&hkSDwindleNodeData_recalcSizePosRecursive);
 
 
   //mousebutto
-  g_pCInputManager_onMouseButton = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::onMouseButton, (void*)&hkCInputManager_onMouseButton);
+  g_hycov_pCInputManager_onMouseButton = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::onMouseButton, (void*)&hkCInputManager_onMouseButton);
 
   //create private function hook
 
   // hook function of changeworkspace
   static const auto ChangeworkspaceMethods = HyprlandAPI::findFunctionsByName(PHANDLE, "changeworkspace");
-  g_pChangeworkspaceHook = HyprlandAPI::createFunctionHook(PHANDLE, ChangeworkspaceMethods[0].address, (void*)&hkChangeworkspace);
+  g_hycov_pChangeworkspaceHook = HyprlandAPI::createFunctionHook(PHANDLE, ChangeworkspaceMethods[0].address, (void*)&hkChangeworkspace);
 
   // hook function of moveActiveToWorkspace
   static const auto MoveActiveToWorkspaceMethods = HyprlandAPI::findFunctionsByName(PHANDLE, "moveActiveToWorkspace");
-  g_pMoveActiveToWorkspaceHook = HyprlandAPI::createFunctionHook(PHANDLE, MoveActiveToWorkspaceMethods[0].address, (void*)&hkMoveActiveToWorkspace);
+  g_hycov_pMoveActiveToWorkspaceHook = HyprlandAPI::createFunctionHook(PHANDLE, MoveActiveToWorkspaceMethods[0].address, (void*)&hkMoveActiveToWorkspace);
 
   // hook function of spawn (bindkey will call spawn to excute a command or a dispatch)
   static const auto SpawnMethods = HyprlandAPI::findFunctionsByName(PHANDLE, "spawn");
-  g_pSpawnHook = HyprlandAPI::createFunctionHook(PHANDLE, SpawnMethods[0].address, (void*)&hkSpawn);
+  g_hycov_pSpawnHook = HyprlandAPI::createFunctionHook(PHANDLE, SpawnMethods[0].address, (void*)&hkSpawn);
 
   //hook function of fullscreenActive
   static const auto FullscreenActiveMethods = HyprlandAPI::findFunctionsByName(PHANDLE, "fullscreenActive");
-  g_pFullscreenActiveHook = HyprlandAPI::createFunctionHook(PHANDLE, FullscreenActiveMethods[0].address, (void*)&hkFullscreenActive);
+  g_hycov_pFullscreenActiveHook = HyprlandAPI::createFunctionHook(PHANDLE, FullscreenActiveMethods[0].address, (void*)&hkFullscreenActive);
 
   //register pEvent hook
-  if(g_enable_hotarea){
-    g_pCInputManager_onMouseButton->hook();
+  if(g_hycov_enable_hotarea){
+    g_hycov_pCInputManager_onMouseButton->hook();
     HyprlandAPI::registerCallbackDynamic(PHANDLE, "mouseMove",[&](void* self, SCallbackInfo& info, std::any data) { mouseMoveHook(self, info, data); });
   }
 
   //if enable gesture, apply hook Swipe function 
-  if(g_enable_gesture){
-    g_pOnSwipeBeginHook->hook();
-    g_pOnSwipeEndHook->hook();
-    g_pOnSwipeUpdateHook->hook();
+  if(g_hycov_enable_gesture){
+    g_hycov_pOnSwipeBeginHook->hook();
+    g_hycov_pOnSwipeEndHook->hook();
+    g_hycov_pOnSwipeUpdateHook->hook();
   }
 
   //if enable auto_exit, apply hook RemovedTiling function
-  if(g_auto_exit){
-    g_pCWindow_onUnmap->hook();
+  if(g_hycov_auto_exit){
+    g_hycov_pCWindow_onUnmap->hook();
   }
 
   //apply hook OnKeyboardKey function
-  if (g_enable_alt_release_exit) {
-      g_pOnKeyboardKeyHook->hook();
+  if (g_hycov_enable_alt_release_exit) {
+      g_hycov_pOnKeyboardKeyHook->hook();
   }
 
   // TODO: wait hyprland to support this function hook
   // enable hook fullscreenActive funciton
-  g_pFullscreenActiveHook->hook();
+  g_hycov_pFullscreenActiveHook->hook();
 }

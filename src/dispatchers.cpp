@@ -31,7 +31,7 @@ bool want_auto_fullscren(CWindow *pWindow) {
 		return false;
 	}
 
-	auto pNode = g_GridLayout->getNodeFromWindow(pWindow);
+	auto pNode = g_hycov_GridLayout->getNodeFromWindow(pWindow);
 
 	if(!pNode) {
 		return true;
@@ -43,7 +43,7 @@ bool want_auto_fullscren(CWindow *pWindow) {
 	}
 
 	// caculate the number of clients that will be in the same workspace with pWindow(don't contain itself)
-	for (auto &n : g_GridLayout->m_lGridNodesData) {
+	for (auto &n : g_hycov_GridLayout->m_lGridNodesData) {
 		if(n.pWindow != pNode->pWindow && n.ovbk_windowWorkspaceId == pNode->ovbk_windowWorkspaceId) {
 			nodeNumInTargetWorkspace++;
 		}
@@ -98,7 +98,7 @@ CWindow *direction_select(std::string arg){
   	  return nullptr;
   	int sel_x = pTempClient->m_vRealPosition.goalv().x;
   	int sel_y = pTempClient->m_vRealPosition.goalv().y;
-  	long long int distance = LLONG_MAX;
+  	long long int distance = LLONG_MAX;;
   	// int temp_focus = 0;
 
 	auto values = CVarList(arg);
@@ -268,13 +268,13 @@ void dispatch_focusdir(std::string arg)
 
 void dispatch_toggleoverview(std::string arg)
 {
-	if (g_isOverView && (!g_enable_alt_release_exit || arg == "internalToggle")) {
+	if (g_hycov_isOverView && (!g_hycov_enable_alt_release_exit || arg == "internalToggle")) {
 		dispatch_leaveoverview("");
-		hycov_log(LOG,"leave overview:toggleMethod:{},enable_alt_release_exit:{}",arg,g_enable_alt_release_exit);
-	} else if (g_isOverView && g_enable_alt_release_exit && arg != "internalToggle") {
+		hycov_log(LOG,"leave overview:toggleMethod:{},enable_alt_release_exit:{}",arg,g_hycov_enable_alt_release_exit);
+	} else if (g_hycov_isOverView && g_hycov_enable_alt_release_exit && arg != "internalToggle") {
 		dispatch_circle("");
 		hycov_log(LOG,"toggle overview:switch focus circlely");
-	} else if(g_enable_alt_release_exit && g_alt_toggle_auto_next) {
+	} else if(g_hycov_enable_alt_release_exit && g_hycov_alt_toggle_auto_next) {
 		dispatch_enteroverview("");
 		dispatch_circle("");
 		hycov_log(LOG,"enter overview:alt switch mode auto next");
@@ -286,12 +286,12 @@ void dispatch_toggleoverview(std::string arg)
 
 void dispatch_enteroverview(std::string arg)
 { 
-	if(g_isOverView) {
+	if(g_hycov_isOverView) {
 		return;
 	}
 
 	if (arg == "forceall") {
-		g_forece_display_all = true;
+		g_hycov_forece_display_all = true;
 		hycov_log(LOG,"force display all clients");
 	}
 	//ali clients exit fullscreen status before enter overview
@@ -316,7 +316,7 @@ void dispatch_enteroverview(std::string arg)
 	}
 
 	hycov_log(LOG,"enter overview");
-	g_isOverView = true;
+	g_hycov_isOverView = true;
 
 	//make all fullscreen window exit fullscreen state
 	for (auto &w : g_pCompositor->m_vWorkspaces)
@@ -350,23 +350,23 @@ void dispatch_enteroverview(std::string arg)
 		g_pCompositor->focusWindow(pActiveWindow); //restore the focus to before active window
 
 	} else {
-		auto node = g_GridLayout->m_lGridNodesData.back();
+		auto node = g_hycov_GridLayout->m_lGridNodesData.back();
 		g_pCompositor->focusWindow(node.pWindow);
 	}
 
 	//disable changeworkspace
-	if(g_disable_workspace_change) {
-  		g_pChangeworkspaceHook->hook();
-		g_pMoveActiveToWorkspaceHook->hook();
+	if(g_hycov_disable_workspace_change) {
+  		g_hycov_pChangeworkspaceHook->hook();
+		g_hycov_pMoveActiveToWorkspaceHook->hook();
 	}
 
 	//disable spawn
-	if(g_disable_spawn) {
-		g_pSpawnHook->hook();
+	if(g_hycov_disable_spawn) {
+		g_hycov_pSpawnHook->hook();
 	}
 
 	if (arg == "forceall") {
-		g_forece_display_all = false;
+		g_hycov_forece_display_all = false;
 	}
 
 	return;
@@ -374,50 +374,50 @@ void dispatch_enteroverview(std::string arg)
 
 void dispatch_leaveoverview(std::string arg)
 { 
-	if(!g_isOverView) {
+	if(!g_hycov_isOverView) {
 		return;
 	}
 	// get default layout
 	std::string *configLayoutName = &HyprlandAPI::getConfigValue(PHANDLE, "general:layout")->strValue;
 
-	if(!g_isOverView){
+	if(!g_hycov_isOverView){
 		return;
 	}
 	
 	hycov_log(LOG,"leave overview");
-	g_isOverView = false;
+	g_hycov_isOverView = false;
 	//mark exiting overview mode
-	g_isOverViewExiting = true;
+	g_hycov_isOverViewExiting = true;
 	
 	//restore workspace name
 	g_pCompositor->renameWorkspace(workspaceIdBackup,workspaceNameBackup);
 
 	//enable changeworkspace
-	if(g_disable_workspace_change) {
-  		g_pChangeworkspaceHook->unhook();
-		g_pMoveActiveToWorkspaceHook->unhook();
+	if(g_hycov_disable_workspace_change) {
+  		g_hycov_pChangeworkspaceHook->unhook();
+		g_hycov_pMoveActiveToWorkspaceHook->unhook();
 	}
 
 	//enable spawn
-	if(g_disable_spawn) {
-		g_pSpawnHook->unhook();
+	if(g_hycov_disable_spawn) {
+		g_hycov_pSpawnHook->unhook();
 	}
 
 	// if no clients, just exit overview, don't restore client's state
-	if (g_GridLayout->m_lGridNodesData.empty())
+	if (g_hycov_GridLayout->m_lGridNodesData.empty())
 	{
 		g_pLayoutManager->switchToLayout(*configLayoutName);	
-		g_GridLayout->m_lGridNodesData.clear();
-		g_isOverViewExiting = false;
+		g_hycov_GridLayout->m_lGridNodesData.clear();
+		g_hycov_isOverViewExiting = false;
 		return;
 	}
 
 	//move clients to it's original workspace 
-	g_GridLayout->moveWindowToSourceWorkspace();
+	g_hycov_GridLayout->moveWindowToSourceWorkspace();
 	// go to the workspace where the active client was before
-	g_GridLayout->changeToActivceSourceWorkspace();
+	g_hycov_GridLayout->changeToActivceSourceWorkspace();
 	
-	for (auto &n : g_GridLayout->m_lGridNodesData)
+	for (auto &n : g_hycov_GridLayout->m_lGridNodesData)
 	{	
 		//make all window restore it's style
     	n.pWindow->m_sSpecialRenderData.border   = n.ovbk_windowIsWithBorder;
@@ -471,17 +471,17 @@ void dispatch_leaveoverview(std::string arg)
 		g_pCompositor->focusWindow(pActiveWindow); //restore the focus to before active window
 		if(pActiveWindow->m_bIsFloating) {
 			g_pCompositor->changeWindowZOrder(pActiveWindow, true);
-		} else if(g_auto_fullscreen && want_auto_fullscren(pActiveWindow)) { // if enale auto_fullscreen after exit overview
+		} else if(g_hycov_auto_fullscreen && want_auto_fullscren(pActiveWindow)) { // if enale auto_fullscreen after exit overview
 			g_pCompositor->setWindowFullscreen(pActiveWindow,true,FULLSCREEN_MAXIMIZED);
 		}
 	} else {
-		auto node = g_GridLayout->m_lGridNodesData.back();
+		auto node = g_hycov_GridLayout->m_lGridNodesData.back();
 		auto pActiveMonitor	= g_pCompositor->m_pLastMonitor;
 		if(node.pWindow->m_iWorkspaceID == pActiveMonitor->activeWorkspace)
 			g_pCompositor->focusWindow(node.pWindow);
 	}
 
-	for (auto &n : g_GridLayout->m_lGridNodesData)
+	for (auto &n : g_hycov_GridLayout->m_lGridNodesData)
 	{
 		//make all fullscrenn windwo restore it's status
 		if (n.ovbk_windowIsFullscreen)
@@ -504,16 +504,16 @@ void dispatch_leaveoverview(std::string arg)
 	}
 
 	//clean overview layout node date
-	g_GridLayout->m_lGridNodesData.clear();
+	g_hycov_GridLayout->m_lGridNodesData.clear();
 
 	//mark has exited overview mode
-	g_isOverViewExiting = false;
+	g_hycov_isOverViewExiting = false;
 	return;
 }
 
 void registerDispatchers()
 {
-	g_forece_display_all = false;
+	g_hycov_forece_display_all = false;
 	HyprlandAPI::addDispatcher(PHANDLE, "hycov:enteroverview", dispatch_enteroverview);
 	HyprlandAPI::addDispatcher(PHANDLE, "hycov:leaveoverview", dispatch_leaveoverview);
 	HyprlandAPI::addDispatcher(PHANDLE, "hycov:toggleoverview", dispatch_toggleoverview);

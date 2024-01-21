@@ -56,27 +56,27 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 	static const auto *pAlt_replace_key = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:alt_replace_key")->strValue;
 
 
-	g_enable_hotarea = *pEnable_hotarea_config;
-	g_hotarea_monitor = *pHotarea_monitor_config;
-	g_hotarea_pos = *pHotarea_pos_config;
-	g_hotarea_size = *pHotarea_size_config;
-	g_swipe_fingers = *pSwipe_fingers_config;
-	g_move_focus_distance = *pMove_focus_distance_config;
-	g_enable_gesture = *pEnable_gesture_config;
-	g_disable_workspace_change = *pDisable_workspace_change_config;
-	g_disable_spawn = *pDisable_spawn_config;
-	g_auto_exit = *pAuto_exit_config;
-	g_auto_fullscreen = *pAuto_fullscreen;
-	g_only_active_workspace = *pOnly_active_workspace;
-	g_only_active_monitor = *pOnly_active_monitor;
-	g_enable_alt_release_exit = *pEnable_alt_release_exit;
-	g_alt_toggle_auto_next = *pAlt_toggle_auto_next;
-	g_click_in_cursor = *pClick_in_cursor;
-	g_hight_of_titlebar= *pHight_of_titlebar;
-	g_alt_replace_key = *pAlt_replace_key;
+	g_hycov_enable_hotarea = *pEnable_hotarea_config;
+	g_hycov_hotarea_monitor = *pHotarea_monitor_config;
+	g_hycov_hotarea_pos = *pHotarea_pos_config;
+	g_hycov_hotarea_size = *pHotarea_size_config;
+	g_hycov_swipe_fingers = *pSwipe_fingers_config;
+	g_hycov_move_focus_distance = *pMove_focus_distance_config;
+	g_hycov_enable_gesture = *pEnable_gesture_config;
+	g_hycov_disable_workspace_change = *pDisable_workspace_change_config;
+	g_hycov_disable_spawn = *pDisable_spawn_config;
+	g_hycov_auto_exit = *pAuto_exit_config;
+	g_hycov_auto_fullscreen = *pAuto_fullscreen;
+	g_hycov_only_active_workspace = *pOnly_active_workspace;
+	g_hycov_only_active_monitor = *pOnly_active_monitor;
+	g_hycov_enable_alt_release_exit = *pEnable_alt_release_exit;
+	g_hycov_alt_toggle_auto_next = *pAlt_toggle_auto_next;
+	g_hycov_click_in_cursor = *pClick_in_cursor;
+	g_hycov_hight_of_titlebar= *pHight_of_titlebar;
+	g_hycov_alt_replace_key = *pAlt_replace_key;
 
-	g_GridLayout = std::make_unique<GridLayout>();
-	HyprlandAPI::addLayout(PHANDLE, "grid", g_GridLayout.get());
+	g_hycov_GridLayout = std::make_unique<GridLayout>();
+	HyprlandAPI::addLayout(PHANDLE, "grid", g_hycov_GridLayout.get());
 
 	registerGlobalEventHook();
 	registerDispatchers();

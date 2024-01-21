@@ -28,7 +28,7 @@ int GridLayout::getNodesNumOnWorkspace(const int &ws)
 
 void GridLayout::resizeNodeSizePos(SGridNodeData *node, int x, int y, int width, int height)
 {   
-    node->size = Vector2D(width, height - g_hight_of_titlebar);
+    node->size = Vector2D(width, height - g_hycov_hight_of_titlebar);
     node->position = Vector2D(x, y);
     applyNodeDataToWindow(node);
 }
@@ -68,7 +68,7 @@ void GridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
     pNode->ovbk_windowIsWithShadow = pWindow->m_sSpecialRenderData.shadow;
 
     //change all client workspace to active worksapce 
-    if ((pWindowOriWorkspace->m_iID != pActiveWorkspace->m_iID || pWindowOriWorkspace->m_szName != pActiveWorkspace->m_szName) && (!g_only_active_workspace || g_forece_display_all))    {
+    if ((pWindowOriWorkspace->m_iID != pActiveWorkspace->m_iID || pWindowOriWorkspace->m_szName != pActiveWorkspace->m_szName) && (!g_hycov_only_active_workspace || g_hycov_forece_display_all))    {
         pNode->workspaceID = pWindow->m_iWorkspaceID = pActiveWorkspace->m_iID;
         pNode->workspaceName = pActiveWorkspace->m_szName;
     }
@@ -97,22 +97,22 @@ void GridLayout::removeOldLayoutData(CWindow *pWindow) {
 
     if(*configLayoutName == "dwindle") {
         // disable render client of old layout
-        g_pHyprDwindleLayout_recalculateMonitor->hook();
-        g_pHyprDwindleLayout_recalculateWindow->hook();
-        g_pSDwindleNodeData_recalcSizePosRecursive->hook();
+        g_hycov_pHyprDwindleLayout_recalculateMonitor->hook();
+        g_hycov_pHyprDwindleLayout_recalculateWindow->hook();
+        g_hycov_pSDwindleNodeData_recalcSizePosRecursive->hook();
 
         // only remove data,not render anything,becaust still in overview
         g_pLayoutManager->getCurrentLayout()->onWindowRemovedTiling(pWindow);
 
-        g_pSDwindleNodeData_recalcSizePosRecursive->unhook();
-        g_pHyprDwindleLayout_recalculateWindow->unhook();
-        g_pHyprDwindleLayout_recalculateMonitor->unhook();
+        g_hycov_pSDwindleNodeData_recalcSizePosRecursive->unhook();
+        g_hycov_pHyprDwindleLayout_recalculateWindow->unhook();
+        g_hycov_pHyprDwindleLayout_recalculateMonitor->unhook();
     } else if(*configLayoutName == "master") {
-        g_pHyprMasterLayout_recalculateMonitor->hook();
+        g_hycov_pHyprMasterLayout_recalculateMonitor->hook();
 
         g_pLayoutManager->getCurrentLayout()->onWindowRemovedTiling(pWindow);
 
-        g_pHyprMasterLayout_recalculateMonitor->unhook();
+        g_hycov_pHyprMasterLayout_recalculateMonitor->unhook();
     } else {
         // may be not support other layout
         hycov_log(ERR,"unknow old layout:{}",*configLayoutName);
@@ -413,7 +413,7 @@ void GridLayout::onEnable()
         if (pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut || g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID))
             continue;
 
-        if(pWindow->m_iMonitorID != g_pCompositor->m_pLastMonitor->ID && (g_only_active_monitor || g_forece_display_all))
+        if(pWindow->m_iMonitorID != g_pCompositor->m_pLastMonitor->ID && (g_hycov_only_active_monitor || g_hycov_forece_display_all))
             continue;
 
         onWindowCreatedTiling(pWindow);
