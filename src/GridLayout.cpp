@@ -146,8 +146,6 @@ void GridLayout::onWindowRemovedTiling(CWindow *pWindow)
         return;
     }
 
-    auto pMonitor = g_pCompositor->getMonitorFromID(pWindow->m_iMonitorID);
-
     recalculateMonitor(pWindow->m_iMonitorID);
 
     lastNode = m_lGridNodesData.back();
