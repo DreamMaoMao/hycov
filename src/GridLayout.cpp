@@ -131,10 +131,11 @@ void GridLayout::onWindowRemovedTiling(CWindow *pWindow)
     hycov_log(LOG,"remove tiling windwo:{}",pWindow);
 
     const auto pNode = getNodeFromWindow(pWindow);
-    SGridNodeData lastNode;
 
     if (!pNode)
         return;
+
+    auto currentWorkspaceID = pWindow->m_iWorkspaceID;
 
     if(pNode->isInOldLayout) { // if client is taken from the old layout
         removeOldLayoutData(pWindow);
@@ -148,11 +149,14 @@ void GridLayout::onWindowRemovedTiling(CWindow *pWindow)
 
     recalculateMonitor(pWindow->m_iMonitorID);
 
-    lastNode = m_lGridNodesData.back();
+    for (auto &n : m_lGridNodesData) {
+        hycov_log(LOG,"refocus to targeworkspace:{},current window workspace:{}",currentWorkspaceID,n.pWindow->m_iWorkspaceID);
+        if (n.pWindow->m_iWorkspaceID == currentWorkspaceID) {
+            g_pCompositor->focusWindow(n.pWindow);
+            break;
+        }
+    }
 
-	auto pActiveMonitor	= g_pCompositor->m_pLastMonitor;
-	if(lastNode.pWindow->m_iWorkspaceID == pActiveMonitor->activeWorkspace)
-		g_pCompositor->focusWindow(lastNode.pWindow);
 }
 
 bool GridLayout::isWindowTiled(CWindow *pWindow)
