@@ -354,8 +354,11 @@ void dispatch_enteroverview(std::string arg)
 		g_pCompositor->focusWindow(pActiveWindow); //restore the focus to before active window
 
 	} else {
-		auto node = g_hycov_GridLayout->m_lGridNodesData.back();
-		g_pCompositor->focusWindow(node.pWindow);
+		for (auto &n : g_hycov_GridLayout->m_lGridNodesData){
+			if(!g_pCompositor->isWorkspaceSpecial(n.workspaceID)) {
+				g_pCompositor->focusWindow(n.pWindow);
+			}
+		}
 	}
 
 	//disable changeworkspace
