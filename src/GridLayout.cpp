@@ -45,7 +45,6 @@ void GridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
 
     if(isFromOnEnable) {
         pNode->isInOldLayout = true; //client is taken from the old layout
-        isFromOnEnable = false;
     }
 
     pNode->workspaceID = pWindow->m_iWorkspaceID; // encapsulate window objects as node objects to bind more properties
@@ -67,8 +66,9 @@ void GridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
     pNode->ovbk_windowIsWithRounding = pWindow->m_sSpecialRenderData.rounding;
     pNode->ovbk_windowIsWithShadow = pWindow->m_sSpecialRenderData.shadow;
 
+
     //change all client workspace to active worksapce 
-    if ((pWindowOriWorkspace->m_iID != pActiveWorkspace->m_iID || pWindowOriWorkspace->m_szName != pActiveWorkspace->m_szName) && (!g_hycov_only_active_workspace || g_hycov_forece_display_all))    {
+    if ( !g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID) && isFromOnEnable && (pWindowOriWorkspace->m_iID != pActiveWorkspace->m_iID || pWindowOriWorkspace->m_szName != pActiveWorkspace->m_szName) && (!g_hycov_only_active_workspace || g_hycov_forece_display_all))    {
         pNode->workspaceID = pWindow->m_iWorkspaceID = pActiveWorkspace->m_iID;
         pNode->workspaceName = pActiveWorkspace->m_szName;
     }
@@ -85,7 +85,11 @@ void GridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
         pWindow->updateDynamicRules();
     }
 
+    isFromOnEnable = false;
+
+
     recalculateMonitor(pWindow->m_iMonitorID);
+    
 }
 
 
@@ -141,6 +145,7 @@ void GridLayout::onWindowRemovedTiling(CWindow *pWindow)
     if(m_lGridNodesData.empty()){
         return;
     }
+
     recalculateMonitor(pWindow->m_iMonitorID);
 
     lastNode = m_lGridNodesData.back();
@@ -266,11 +271,16 @@ void GridLayout::calculateWorkspace(const int &ws)
 void GridLayout::recalculateMonitor(const int &monid)
 {
     const auto pMonitor = g_pCompositor->getMonitorFromID(monid);                       // 根据monitor id获取monitor对象
+    g_pHyprRenderer->damageMonitor(pMonitor); // Use local rendering
+
+    if (pMonitor->specialWorkspaceID) {
+        calculateWorkspace(pMonitor->specialWorkspaceID);
+        return;
+    }
+
     const auto pWorksapce = g_pCompositor->getWorkspaceByID(pMonitor->activeWorkspace); // 获取当前workspace对象
     if (!pWorksapce)
         return;
-
-    g_pHyprRenderer->damageMonitor(pMonitor); // Use local rendering
 
     calculateWorkspace(pWorksapce->m_iID); // calculate windwo's size and position
 }
@@ -410,7 +420,7 @@ void GridLayout::onEnable()
         
         CWindow *pWindow = w.get();
 
-        if (pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut || g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID))
+        if (pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut)
             continue;
 
         if(pWindow->m_iMonitorID != g_pCompositor->m_pLastMonitor->ID && (g_hycov_only_active_monitor || g_hycov_forece_display_all))

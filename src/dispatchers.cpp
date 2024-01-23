@@ -290,6 +290,10 @@ void dispatch_enteroverview(std::string arg)
 		return;
 	}
 
+	const auto pMonitor = g_pCompositor->m_pLastMonitor;
+	if(pMonitor->specialWorkspaceID != 0)
+		pMonitor->setSpecialWorkspace(nullptr);
+
 	if (arg == "forceall") {
 		g_hycov_forece_display_all = true;
 		hycov_log(LOG,"force display all clients");
@@ -350,8 +354,11 @@ void dispatch_enteroverview(std::string arg)
 		g_pCompositor->focusWindow(pActiveWindow); //restore the focus to before active window
 
 	} else {
-		auto node = g_hycov_GridLayout->m_lGridNodesData.back();
-		g_pCompositor->focusWindow(node.pWindow);
+		for (auto &n : g_hycov_GridLayout->m_lGridNodesData){
+			if(!g_pCompositor->isWorkspaceSpecial(n.workspaceID)) {
+				g_pCompositor->focusWindow(n.pWindow);
+			}
+		}
 	}
 
 	//disable changeworkspace
@@ -377,6 +384,11 @@ void dispatch_leaveoverview(std::string arg)
 	if(!g_hycov_isOverView) {
 		return;
 	}
+
+	const auto pMonitor = g_pCompositor->m_pLastMonitor;
+	if(pMonitor->specialWorkspaceID != 0)
+		pMonitor->setSpecialWorkspace(nullptr);
+	
 	// get default layout
 	std::string *configLayoutName = &HyprlandAPI::getConfigValue(PHANDLE, "general:layout")->strValue;
 
