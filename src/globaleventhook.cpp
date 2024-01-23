@@ -193,7 +193,7 @@ static void hkCWindow_onUnmap(void* thisptr) {
   auto nodeNumInSameMonitor = 0;
   auto nodeNumInSameWorkspace = 0;
 	for (auto &n : g_hycov_GridLayout->m_lGridNodesData) {
-		if(n.pWindow->m_iMonitorID == g_pCompositor->m_pLastMonitor->ID && !g_pCompositor->isWorkspaceSpecial(n.pWindow->m_iWorkspaceID)) {
+		if(n.pWindow->m_iMonitorID == g_pCompositor->m_pLastMonitor->ID) {
 			nodeNumInSameMonitor++;
 		}
 		if(n.pWindow->m_iWorkspaceID == g_pCompositor->m_pLastMonitor->activeWorkspace) {
