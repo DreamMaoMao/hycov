@@ -3,6 +3,18 @@
 #include "GridLayout.hpp"
 #include "dispatchers.hpp"
 
+CWindow *GridLayout::getNextFocusWindow(bool isInSpecial) {
+
+    for (auto &w : g_pCompositor->m_vWindows)
+    {
+		CWindow *pWindow = w.get();
+        if (!isInSpecial || pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut || pWindow->m_bIsFullscreen)
+            continue;
+		return pWindow;
+    }
+	return nullptr;
+}
+
 SGridNodeData *GridLayout::getNodeFromWindow(CWindow *pWindow)
 {
     for (auto &nd : m_lGridNodesData)
@@ -149,12 +161,10 @@ void GridLayout::onWindowRemovedTiling(CWindow *pWindow)
 
     recalculateMonitor(pWindow->m_iMonitorID);
 
-    for (auto &n : m_lGridNodesData) {
-        hycov_log(LOG,"refocus to targeworkspace:{},current window workspace:{}",currentWorkspaceID,n.pWindow->m_iWorkspaceID);
-        if (n.pWindow->m_iWorkspaceID == currentWorkspaceID) {
-            g_pCompositor->focusWindow(n.pWindow);
-            break;
-        }
+    bool b_isInSpecial = g_pCompositor->m_pLastMonitor->specialWorkspaceID == 0? true : false;
+    auto pNeedFoucsWindow = getNextFocusWindow(b_isInSpecial);
+    if(pNeedFoucsWindow) {
+        g_pCompositor->focusWindow(pNeedFoucsWindow);
     }
 
 }
