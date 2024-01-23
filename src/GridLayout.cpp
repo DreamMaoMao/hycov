@@ -324,7 +324,6 @@ void GridLayout::applyNodeDataToWindow(SGridNodeData *pNode)
     g_pXWaylandManager->setWindowSize(pWindow, calcSize);
 
     pWindow->updateWindowDecos();
-    // g_pCompositor->focusWindow(pWindow);
 }
 
 void GridLayout::recalculateWindow(CWindow *pWindow)

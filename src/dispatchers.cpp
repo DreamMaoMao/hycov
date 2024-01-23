@@ -486,11 +486,6 @@ void dispatch_leaveoverview(std::string arg)
 		} else if(g_hycov_auto_fullscreen && want_auto_fullscren(pActiveWindow)) { // if enale auto_fullscreen after exit overview
 			g_pCompositor->setWindowFullscreen(pActiveWindow,true,FULLSCREEN_MAXIMIZED);
 		}
-	} else {
-		auto node = g_hycov_GridLayout->m_lGridNodesData.back();
-		auto pActiveMonitor	= g_pCompositor->m_pLastMonitor;
-		if(node.pWindow->m_iWorkspaceID == pActiveMonitor->activeWorkspace)
-			g_pCompositor->focusWindow(node.pWindow);
 	}
 
 	for (auto &n : g_hycov_GridLayout->m_lGridNodesData)
