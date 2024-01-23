@@ -59,6 +59,7 @@ public:
   void moveWindowToSourceWorkspace();
   void changeToActivceSourceWorkspace();
   void removeOldLayoutData(CWindow *pWindow);
+  CWindow *getNextFocusWindow(int workspaceID);
 
   bool isFromOnEnable = false;
 private:

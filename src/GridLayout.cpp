@@ -3,6 +3,18 @@
 #include "GridLayout.hpp"
 #include "dispatchers.hpp"
 
+CWindow *GridLayout::getNextFocusWindow(int workspaceID) {
+
+    for (auto &w : g_pCompositor->m_vWindows)
+    {
+		CWindow *pWindow = w.get();
+        if ((g_pCompositor->m_pLastMonitor->specialWorkspaceID != 0 && !g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID)) || (g_pCompositor->m_pLastMonitor->specialWorkspaceID == 0 && g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID)) || pWindow->m_iWorkspaceID != workspaceID || pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut || pWindow->m_bIsFullscreen)
+            continue;
+		return pWindow;
+    }
+	return nullptr;
+}
+
 SGridNodeData *GridLayout::getNodeFromWindow(CWindow *pWindow)
 {
     for (auto &nd : m_lGridNodesData)
@@ -45,7 +57,6 @@ void GridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
 
     if(isFromOnEnable) {
         pNode->isInOldLayout = true; //client is taken from the old layout
-        isFromOnEnable = false;
     }
 
     pNode->workspaceID = pWindow->m_iWorkspaceID; // encapsulate window objects as node objects to bind more properties
@@ -67,8 +78,9 @@ void GridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
     pNode->ovbk_windowIsWithRounding = pWindow->m_sSpecialRenderData.rounding;
     pNode->ovbk_windowIsWithShadow = pWindow->m_sSpecialRenderData.shadow;
 
+
     //change all client workspace to active worksapce 
-    if ((pWindowOriWorkspace->m_iID != pActiveWorkspace->m_iID || pWindowOriWorkspace->m_szName != pActiveWorkspace->m_szName) && (!g_hycov_only_active_workspace || g_hycov_forece_display_all))    {
+    if ( !g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID) && isFromOnEnable && (pWindowOriWorkspace->m_iID != pActiveWorkspace->m_iID || pWindowOriWorkspace->m_szName != pActiveWorkspace->m_szName) && (!g_hycov_only_active_workspace || g_hycov_forece_display_all))    {
         pNode->workspaceID = pWindow->m_iWorkspaceID = pActiveWorkspace->m_iID;
         pNode->workspaceName = pActiveWorkspace->m_szName;
     }
@@ -85,7 +97,11 @@ void GridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
         pWindow->updateDynamicRules();
     }
 
+    isFromOnEnable = false;
+
+
     recalculateMonitor(pWindow->m_iMonitorID);
+    
 }
 
 
@@ -127,10 +143,11 @@ void GridLayout::onWindowRemovedTiling(CWindow *pWindow)
     hycov_log(LOG,"remove tiling windwo:{}",pWindow);
 
     const auto pNode = getNodeFromWindow(pWindow);
-    SGridNodeData lastNode;
 
     if (!pNode)
         return;
+
+    auto currentWorkspaceID = pWindow->m_iWorkspaceID;
 
     if(pNode->isInOldLayout) { // if client is taken from the old layout
         removeOldLayoutData(pWindow);
@@ -141,13 +158,14 @@ void GridLayout::onWindowRemovedTiling(CWindow *pWindow)
     if(m_lGridNodesData.empty()){
         return;
     }
+
     recalculateMonitor(pWindow->m_iMonitorID);
 
-    lastNode = m_lGridNodesData.back();
+    auto pNeedFoucsWindow = getNextFocusWindow(currentWorkspaceID);
+    if(pNeedFoucsWindow) {
+        g_pCompositor->focusWindow(pNeedFoucsWindow);
+    }
 
-	auto pActiveMonitor	= g_pCompositor->m_pLastMonitor;
-	if(lastNode.pWindow->m_iWorkspaceID == pActiveMonitor->activeWorkspace)
-		g_pCompositor->focusWindow(lastNode.pWindow);
 }
 
 bool GridLayout::isWindowTiled(CWindow *pWindow)
@@ -266,11 +284,16 @@ void GridLayout::calculateWorkspace(const int &ws)
 void GridLayout::recalculateMonitor(const int &monid)
 {
     const auto pMonitor = g_pCompositor->getMonitorFromID(monid);                       // 根据monitor id获取monitor对象
+    g_pHyprRenderer->damageMonitor(pMonitor); // Use local rendering
+
+    if (pMonitor->specialWorkspaceID) {
+        calculateWorkspace(pMonitor->specialWorkspaceID);
+        return;
+    }
+
     const auto pWorksapce = g_pCompositor->getWorkspaceByID(pMonitor->activeWorkspace); // 获取当前workspace对象
     if (!pWorksapce)
         return;
-
-    g_pHyprRenderer->damageMonitor(pMonitor); // Use local rendering
 
     calculateWorkspace(pWorksapce->m_iID); // calculate windwo's size and position
 }
@@ -300,7 +323,6 @@ void GridLayout::applyNodeDataToWindow(SGridNodeData *pNode)
     g_pXWaylandManager->setWindowSize(pWindow, calcSize);
 
     pWindow->updateWindowDecos();
-    // g_pCompositor->focusWindow(pWindow);
 }
 
 void GridLayout::recalculateWindow(CWindow *pWindow)
@@ -410,7 +432,7 @@ void GridLayout::onEnable()
         
         CWindow *pWindow = w.get();
 
-        if (pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut || g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID))
+        if (pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut)
             continue;
 
         if(pWindow->m_iMonitorID != g_pCompositor->m_pLastMonitor->ID && (g_hycov_only_active_monitor || g_hycov_forece_display_all))
