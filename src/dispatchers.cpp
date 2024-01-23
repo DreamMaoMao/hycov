@@ -291,7 +291,8 @@ void dispatch_enteroverview(std::string arg)
 	}
 
 	const auto pMonitor = g_pCompositor->m_pLastMonitor;
-	pMonitor->setSpecialWorkspace(nullptr);
+	if(pMonitor->specialWorkspaceID != 0)
+		pMonitor->setSpecialWorkspace(nullptr);
 
 	if (arg == "forceall") {
 		g_hycov_forece_display_all = true;
@@ -382,7 +383,8 @@ void dispatch_leaveoverview(std::string arg)
 	}
 
 	const auto pMonitor = g_pCompositor->m_pLastMonitor;
-	pMonitor->setSpecialWorkspace(nullptr);
+	if(pMonitor->specialWorkspaceID != 0)
+		pMonitor->setSpecialWorkspace(nullptr);
 	
 	// get default layout
 	std::string *configLayoutName = &HyprlandAPI::getConfigValue(PHANDLE, "general:layout")->strValue;
