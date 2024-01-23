@@ -36,6 +36,7 @@ public:
   virtual void onWindowCreatedTiling(CWindow *, eDirection direction = DIRECTION_DEFAULT);
   virtual void onWindowRemovedTiling(CWindow *);
   virtual bool isWindowTiled(CWindow *);
+  virtual CWindow* getNextWindowCandidate(CWindow*);
   virtual void recalculateMonitor(const int &);
   virtual void recalculateWindow(CWindow *);
   virtual void resizeActiveWindow(const Vector2D &, eRectCorner corner, CWindow *pWindow = nullptr);
@@ -59,7 +60,7 @@ public:
   void moveWindowToSourceWorkspace();
   void changeToActivceSourceWorkspace();
   void removeOldLayoutData(CWindow *pWindow);
-  CWindow *getNextFocusWindow(int workspaceID);
+  // CWindow *getNextFocusWindow(int workspaceID);
 
   bool isFromOnEnable = false;
 private:

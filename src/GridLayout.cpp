@@ -3,17 +3,21 @@
 #include "GridLayout.hpp"
 #include "dispatchers.hpp"
 
-CWindow *GridLayout::getNextFocusWindow(int workspaceID) {
+CWindow *GridLayout::getNextWindowCandidate(CWindow* plastWindow) {
 
+    CWindow *targetWindow =  nullptr;
     for (auto &w : g_pCompositor->m_vWindows)
     {
 		CWindow *pWindow = w.get();
-        if ((g_pCompositor->m_pLastMonitor->specialWorkspaceID != 0 && !g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID)) || (g_pCompositor->m_pLastMonitor->specialWorkspaceID == 0 && g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID)) || pWindow->m_iWorkspaceID != workspaceID || pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut || pWindow->m_bIsFullscreen)
+        if ((g_pCompositor->m_pLastMonitor->specialWorkspaceID != 0 && !g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID)) || (g_pCompositor->m_pLastMonitor->specialWorkspaceID == 0 && g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID)) || pWindow->m_iWorkspaceID != plastWindow->m_iWorkspaceID || pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut || pWindow->m_bIsFullscreen)
             continue;
-		return pWindow;
+		targetWindow = pWindow;
     }
-	return nullptr;
+
+    return targetWindow;
+
 }
+
 
 SGridNodeData *GridLayout::getNodeFromWindow(CWindow *pWindow)
 {
@@ -160,11 +164,6 @@ void GridLayout::onWindowRemovedTiling(CWindow *pWindow)
     }
 
     recalculateMonitor(pWindow->m_iMonitorID);
-
-    auto pNeedFoucsWindow = getNextFocusWindow(currentWorkspaceID);
-    if(pNeedFoucsWindow) {
-        g_pCompositor->focusWindow(pNeedFoucsWindow);
-    }
 
 }
 
