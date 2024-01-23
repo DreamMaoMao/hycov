@@ -133,11 +133,8 @@ void GridLayout::onWindowRemovedTiling(CWindow *pWindow)
     const auto pNode = getNodeFromWindow(pWindow);
     SGridNodeData lastNode;
 
-    if (!pNode) {
-        removeOldLayoutData(pWindow);
+    if (!pNode)
         return;
-    }
-        
 
     if(pNode->isInOldLayout) { // if client is taken from the old layout
         removeOldLayoutData(pWindow);
