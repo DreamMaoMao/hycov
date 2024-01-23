@@ -290,6 +290,9 @@ void dispatch_enteroverview(std::string arg)
 		return;
 	}
 
+	const auto pMonitor = g_pCompositor->m_pLastMonitor;
+	pMonitor->setSpecialWorkspace(nullptr);
+
 	if (arg == "forceall") {
 		g_hycov_forece_display_all = true;
 		hycov_log(LOG,"force display all clients");
@@ -377,6 +380,10 @@ void dispatch_leaveoverview(std::string arg)
 	if(!g_hycov_isOverView) {
 		return;
 	}
+
+	const auto pMonitor = g_pCompositor->m_pLastMonitor;
+	pMonitor->setSpecialWorkspace(nullptr);
+	
 	// get default layout
 	std::string *configLayoutName = &HyprlandAPI::getConfigValue(PHANDLE, "general:layout")->strValue;
 
