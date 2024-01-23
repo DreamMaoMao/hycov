@@ -45,7 +45,6 @@ void GridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
 
     if(isFromOnEnable) {
         pNode->isInOldLayout = true; //client is taken from the old layout
-        isFromOnEnable = false;
     }
 
     pNode->workspaceID = pWindow->m_iWorkspaceID; // encapsulate window objects as node objects to bind more properties
@@ -68,7 +67,7 @@ void GridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
     pNode->ovbk_windowIsWithShadow = pWindow->m_sSpecialRenderData.shadow;
 
     //change all client workspace to active worksapce 
-    if ((pWindowOriWorkspace->m_iID != pActiveWorkspace->m_iID || pWindowOriWorkspace->m_szName != pActiveWorkspace->m_szName) && (!g_hycov_only_active_workspace || g_hycov_forece_display_all))    {
+    if (isFromOnEnable && (pWindowOriWorkspace->m_iID != pActiveWorkspace->m_iID || pWindowOriWorkspace->m_szName != pActiveWorkspace->m_szName) && (!g_hycov_only_active_workspace || g_hycov_forece_display_all))    {
         pNode->workspaceID = pWindow->m_iWorkspaceID = pActiveWorkspace->m_iID;
         pNode->workspaceName = pActiveWorkspace->m_szName;
     }
@@ -85,6 +84,7 @@ void GridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
         pWindow->updateDynamicRules();
     }
 
+    isFromOnEnable = false;
     recalculateMonitor(pWindow->m_iMonitorID);
 }
 
@@ -129,8 +129,11 @@ void GridLayout::onWindowRemovedTiling(CWindow *pWindow)
     const auto pNode = getNodeFromWindow(pWindow);
     SGridNodeData lastNode;
 
-    if (!pNode)
+    if (!pNode) {
+        removeOldLayoutData(pWindow);
         return;
+    }
+        
 
     if(pNode->isInOldLayout) { // if client is taken from the old layout
         removeOldLayoutData(pWindow);
