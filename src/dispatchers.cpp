@@ -508,7 +508,7 @@ void dispatch_leaveoverview(std::string arg)
 			if (n.pWindow->m_bFadingOut || !n.pWindow->m_bIsMapped || n.pWindow->isHidden()) {
 				continue;
 			}
-			hycov_log(LOG,"create tiling window in old layout:{}",n.pWindow);
+			hycov_log(LOG,"create tiling window in old layout,window:{},workspace:{},inoldlayout:{}",n.pWindow,n.workspaceID,n.isInOldLayout);
 			g_pLayoutManager->getCurrentLayout()->onWindowCreatedTiling(n.pWindow);
 		}
 
