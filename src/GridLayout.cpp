@@ -90,14 +90,13 @@ void GridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
     }
 
     // clean fullscreen status
-    if (pWindow->m_bIsFullscreen)
-    {   
+    if (pWindow->m_bIsFullscreen) {   
         pWindow->m_bIsFullscreen = false;
     }
 
     //clean floating status
-    if (pWindow->m_bIsFloating)
-    {        pWindow->m_bIsFloating = false;
+    if (pWindow->m_bIsFloating && isFromOnEnable) {        
+        pWindow->m_bIsFloating = false;
         pWindow->updateDynamicRules();
     }
 
@@ -169,7 +168,7 @@ void GridLayout::onWindowRemovedTiling(CWindow *pWindow)
 
 bool GridLayout::isWindowTiled(CWindow *pWindow)
 {
-    return false;
+    return getNodeFromWindow(pWindow) != nullptr;
 }
 
 void GridLayout::calculateWorkspace(const int &ws)
