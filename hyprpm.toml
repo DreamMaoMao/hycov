@@ -2,7 +2,7 @@
 name = "hycov"
 authors = ["DreamMaoMao"]
 commit_pins = [
-	["03ebbe18ed8517ee22591eac82cd54322f42cb7d", "0f1e52fd7e1235e870ca366d6e9219d0dda3f5bb"]
+	["03ebbe18ed8517ee22591eac82cd54322f42cb7d", "8ebefe07ba33bde673bb6644a0b1e53e5888882f"]
 ]
 
 [hycov]
