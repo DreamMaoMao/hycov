@@ -4,7 +4,7 @@
 #include <regex>
 #include <set>
 #include <hyprland/src/SharedDefs.hpp>
-#include "GridLayout.hpp"
+#include "OvGridLayout.hpp"
 
 // std::unique_ptr<HOOK_CALLBACK_FN> mouseMoveHookPtr = std::make_unique<HOOK_CALLBACK_FN>(mouseMoveHook);
 // std::unique_ptr<HOOK_CALLBACK_FN> mouseButtonHookPtr = std::make_unique<HOOK_CALLBACK_FN>(mouseButtonHook);
@@ -192,7 +192,7 @@ static void hkCWindow_onUnmap(void* thisptr) {
   // after done original thing,The workspace automatically exit overview if no client exists 
   auto nodeNumInSameMonitor = 0;
   auto nodeNumInSameWorkspace = 0;
-	for (auto &n : g_hycov_GridLayout->m_lGridNodesData) {
+	for (auto &n : g_hycov_OvGridLayout->m_lGridNodesData) {
 		if(n.pWindow->m_iMonitorID == g_pCompositor->m_pLastMonitor->ID && !g_pCompositor->isWorkspaceSpecial(n.pWindow->m_iWorkspaceID)) {
 			nodeNumInSameMonitor++;
 		}
@@ -380,7 +380,6 @@ void registerGlobalEventHook()
       g_hycov_pOnKeyboardKeyHook->hook();
   }
 
-  // TODO: wait hyprland to support this function hook
   // enable hook fullscreenActive funciton
   g_hycov_pFullscreenActiveHook->hook();
 }

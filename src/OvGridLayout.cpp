@@ -1,9 +1,10 @@
 
 #include "globals.hpp"
-#include "GridLayout.hpp"
+#include "OvGridLayout.hpp"
 #include "dispatchers.hpp"
 
-CWindow *GridLayout::getNextWindowCandidate(CWindow* plastWindow) {
+// find next focus window after remove a window
+CWindow *OvGridLayout::getNextWindowCandidate(CWindow* plastWindow) {
 
     CWindow *targetWindow =  nullptr;
     for (auto &w : g_pCompositor->m_vWindows)
@@ -11,15 +12,14 @@ CWindow *GridLayout::getNextWindowCandidate(CWindow* plastWindow) {
 		CWindow *pWindow = w.get();
         if ((g_pCompositor->m_pLastMonitor->specialWorkspaceID != 0 && !g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID)) || (g_pCompositor->m_pLastMonitor->specialWorkspaceID == 0 && g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID)) || pWindow->m_iWorkspaceID != plastWindow->m_iWorkspaceID || pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut || pWindow->m_bIsFullscreen)
             continue;
-		targetWindow = pWindow;
+		targetWindow = pWindow; // find the last window that is in same workspace with the remove window
     }
 
     return targetWindow;
 
 }
 
-
-SGridNodeData *GridLayout::getNodeFromWindow(CWindow *pWindow)
+SOvGridNodeData *OvGridLayout::getNodeFromWindow(CWindow *pWindow)
 {
     for (auto &nd : m_lGridNodesData)
     {
@@ -30,7 +30,7 @@ SGridNodeData *GridLayout::getNodeFromWindow(CWindow *pWindow)
     return nullptr;
 }
 
-int GridLayout::getNodesNumOnWorkspace(const int &ws)
+int OvGridLayout::getNodesNumOnWorkspace(const int &ws)
 {
     int no = 0;
     for (auto &n : m_lGridNodesData)
@@ -42,14 +42,14 @@ int GridLayout::getNodesNumOnWorkspace(const int &ws)
     return no;
 }
 
-void GridLayout::resizeNodeSizePos(SGridNodeData *node, int x, int y, int width, int height)
+void OvGridLayout::resizeNodeSizePos(SOvGridNodeData *node, int x, int y, int width, int height)
 {   
     node->size = Vector2D(width, height - g_hycov_hight_of_titlebar);
     node->position = Vector2D(x, y);
     applyNodeDataToWindow(node);
 }
 
-void GridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
+void OvGridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
 {
     const auto pMonitor = g_pCompositor->getMonitorFromID(pWindow->m_iMonitorID); 
 
@@ -83,7 +83,7 @@ void GridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
     pNode->ovbk_windowIsWithShadow = pWindow->m_sSpecialRenderData.shadow;
 
 
-    //change all client workspace to active worksapce 
+    //change all client(exclude special workspace) to active worksapce 
     if ( !g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID) && isFromOnEnable && (pWindowOriWorkspace->m_iID != pActiveWorkspace->m_iID || pWindowOriWorkspace->m_szName != pActiveWorkspace->m_szName) && (!g_hycov_only_active_workspace || g_hycov_forece_display_all))    {
         pNode->workspaceID = pWindow->m_iWorkspaceID = pActiveWorkspace->m_iID;
         pNode->workspaceName = pActiveWorkspace->m_szName;
@@ -94,21 +94,20 @@ void GridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
         pWindow->m_bIsFullscreen = false;
     }
 
-    //clean floating status
+    //clean floating status(only apply to old layout window)
     if (pWindow->m_bIsFloating && isFromOnEnable) {        
         pWindow->m_bIsFloating = false;
         pWindow->updateDynamicRules();
     }
 
+    // reset the orig mark of window
     isFromOnEnable = false;
 
-
-    recalculateMonitor(pWindow->m_iMonitorID);
-    
+    recalculateMonitor(pWindow->m_iMonitorID);    
 }
 
 
-void GridLayout::removeOldLayoutData(CWindow *pWindow) { 
+void OvGridLayout::removeOldLayoutData(CWindow *pWindow) { 
 
 	std::string *configLayoutName = &HyprlandAPI::getConfigValue(PHANDLE, "general:layout")->strValue;
     switchToLayoutWithoutReleaseData(*configLayoutName);
@@ -138,10 +137,10 @@ void GridLayout::removeOldLayoutData(CWindow *pWindow) {
         g_pLayoutManager->getCurrentLayout()->onWindowRemovedTiling(pWindow);
     }
 
-    switchToLayoutWithoutReleaseData("grid");
+    switchToLayoutWithoutReleaseData("ovgrid");
 }
 
-void GridLayout::onWindowRemovedTiling(CWindow *pWindow)
+void OvGridLayout::onWindowRemovedTiling(CWindow *pWindow)
 {
     hycov_log(LOG,"remove tiling windwo:{}",pWindow);
 
@@ -166,16 +165,16 @@ void GridLayout::onWindowRemovedTiling(CWindow *pWindow)
 
 }
 
-bool GridLayout::isWindowTiled(CWindow *pWindow)
+bool OvGridLayout::isWindowTiled(CWindow *pWindow)
 {
     return getNodeFromWindow(pWindow) != nullptr;
 }
 
-void GridLayout::calculateWorkspace(const int &ws)
+void OvGridLayout::calculateWorkspace(const int &ws)
 {
     const auto pWorksapce = g_pCompositor->getWorkspaceByID(ws); 
-    SGridNodeData *pTempNodes[100];
-    SGridNodeData *pNode;
+    SOvGridNodeData *pTempNodes[100];
+    SOvGridNodeData *pNode;
     int i, n = 0;
     int cx, cy;
     int dx, cw, ch;;
@@ -279,7 +278,7 @@ void GridLayout::calculateWorkspace(const int &ws)
     }
 }
 
-void GridLayout::recalculateMonitor(const int &monid)
+void OvGridLayout::recalculateMonitor(const int &monid)
 {
     const auto pMonitor = g_pCompositor->getMonitorFromID(monid);                       // 根据monitor id获取monitor对象
     g_pHyprRenderer->damageMonitor(pMonitor); // Use local rendering
@@ -297,7 +296,7 @@ void GridLayout::recalculateMonitor(const int &monid)
 }
 
 // set window's size and position
-void GridLayout::applyNodeDataToWindow(SGridNodeData *pNode)
+void OvGridLayout::applyNodeDataToWindow(SOvGridNodeData *pNode)
 { 
 
     const auto pWindow = pNode->pWindow;
@@ -323,61 +322,61 @@ void GridLayout::applyNodeDataToWindow(SGridNodeData *pNode)
     pWindow->updateWindowDecos();
 }
 
-void GridLayout::recalculateWindow(CWindow *pWindow)
+void OvGridLayout::recalculateWindow(CWindow *pWindow)
 {
     ; // empty
 }
 
 
-void GridLayout::resizeActiveWindow(const Vector2D &pixResize, eRectCorner corner, CWindow *pWindow)
+void OvGridLayout::resizeActiveWindow(const Vector2D &pixResize, eRectCorner corner, CWindow *pWindow)
 {
     ; // empty
 }
 
-void GridLayout::fullscreenRequestForWindow(CWindow *pWindow, eFullscreenMode mode, bool on)
+void OvGridLayout::fullscreenRequestForWindow(CWindow *pWindow, eFullscreenMode mode, bool on)
 {
     ; // empty
 }
 
-std::any GridLayout::layoutMessage(SLayoutMessageHeader header, std::string content)
+std::any OvGridLayout::layoutMessage(SLayoutMessageHeader header, std::string content)
 {
     return "";
 }
 
-SWindowRenderLayoutHints GridLayout::requestRenderHints(CWindow *pWindow)
+SWindowRenderLayoutHints OvGridLayout::requestRenderHints(CWindow *pWindow)
 {
     return {};
 }
 
-void GridLayout::switchWindows(CWindow *pWindowA, CWindow *pWindowB)
+void OvGridLayout::switchWindows(CWindow *pWindowA, CWindow *pWindowB)
 {
     ; // empty
 }
 
-void GridLayout::alterSplitRatio(CWindow *pWindow, float delta, bool exact)
+void OvGridLayout::alterSplitRatio(CWindow *pWindow, float delta, bool exact)
 {
     ; // empty
 }
 
-std::string GridLayout::getLayoutName()
+std::string OvGridLayout::getLayoutName()
 {
-    return "grid";
+    return "ovgrid";
 }
 
-void GridLayout::replaceWindowDataWith(CWindow *from, CWindow *to)
-{
-    ; // empty
-}
-
-void GridLayout::moveWindowTo(CWindow *, const std::string &dir)
+void OvGridLayout::replaceWindowDataWith(CWindow *from, CWindow *to)
 {
     ; // empty
 }
 
-void GridLayout::changeToActivceSourceWorkspace()
+void OvGridLayout::moveWindowTo(CWindow *, const std::string &dir)
+{
+    ; // empty
+}
+
+void OvGridLayout::changeToActivceSourceWorkspace()
 {
     CWindow *pWindow = nullptr;
-    SGridNodeData *pNode;
+    SOvGridNodeData *pNode;
     CWorkspace *pWorksapce;
     hycov_log(LOG,"changeToActivceSourceWorkspace");
     pWindow = g_pCompositor->m_pLastWindow;
@@ -395,7 +394,7 @@ void GridLayout::changeToActivceSourceWorkspace()
     EMIT_HOOK_EVENT("workspace", pWorksapce);
 }
 
-void GridLayout::moveWindowToSourceWorkspace()
+void OvGridLayout::moveWindowToSourceWorkspace()
 {
     CWorkspace *pWorkspace;
     
@@ -421,7 +420,7 @@ void GridLayout::moveWindowToSourceWorkspace()
 }
 
 // it will exec once when change layout enable
-void GridLayout::onEnable()
+void OvGridLayout::onEnable()
 {
 
     for (auto &w : g_pCompositor->m_vWindows)
@@ -441,7 +440,7 @@ void GridLayout::onEnable()
 }
 
 // it will exec once when change layout disable
-void GridLayout::onDisable()
+void OvGridLayout::onDisable()
 {
     dispatch_leaveoverview("");
 }
