@@ -183,21 +183,26 @@ bool OvGridLayout::isWindowTiled(CWindow *pWindow)
 void OvGridLayout::calculateWorkspace(const int &ws)
 {
     const auto pWorksapce = g_pCompositor->getWorkspaceByID(ws); 
-    SOvGridNodeData *pTempNodes[100];
+    auto dataSize = m_lOvGridNodesData.size();
+    auto pTempNodes = new SOvGridNodeData*[dataSize+1];
     SOvGridNodeData *pNode;
     int i, n = 0;
     int cx, cy;
     int dx, cw, ch;;
     int cols, rows, overcols,NODECOUNT;
 
-    if (!pWorksapce)
+    if (!pWorksapce) {
+        delete[] pTempNodes;
         return;
+    }
 
     NODECOUNT = getNodesNumOnWorkspace(pWorksapce->m_iID);          
     const auto pMonitor = g_pCompositor->getMonitorFromID(pWorksapce->m_iMonitorID); 
 
-    if (NODECOUNT == 0) 
+    if (NODECOUNT == 0) {
+        delete[] pTempNodes;
         return;
+    }
 
     static const auto *PBORDERSIZE = &HyprlandAPI::getConfigValue(PHANDLE, "general:border_size")->intValue;
     static const auto *GAPPO = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:overview_gappo")->intValue;
@@ -227,8 +232,10 @@ void OvGridLayout::calculateWorkspace(const int &ws)
 
     pTempNodes[n] = NULL;
 
-    if (NODECOUNT == 0)
+    if (NODECOUNT == 0) {
+        delete[] pTempNodes;
         return;
+    }
 
     // one client arrange
     if (NODECOUNT == 1)
@@ -238,6 +245,7 @@ void OvGridLayout::calculateWorkspace(const int &ws)
         ch = (w_height - 2 * (*GAPPO)) * 0.8;
         resizeNodeSizePos(pNode, w_x + (int)((m_width - cw) / 2), w_y + (int)((w_height - ch) / 2),
                           cw - 2 * (*PBORDERSIZE), ch - 2 * (*PBORDERSIZE));
+        delete[] pTempNodes;
         return;
     }
 
@@ -251,6 +259,7 @@ void OvGridLayout::calculateWorkspace(const int &ws)
                           cw - 2 * (*PBORDERSIZE), ch - 2 * (*PBORDERSIZE));
         resizeNodeSizePos(pTempNodes[1], m_x + (*GAPPO), m_y + (m_height - ch) / 2 + (*GAPPO),
                           cw - 2 * (*PBORDERSIZE), ch - 2 * (*PBORDERSIZE));
+        delete[] pTempNodes;
         return;
     }
 
@@ -286,6 +295,7 @@ void OvGridLayout::calculateWorkspace(const int &ws)
         }
         resizeNodeSizePos(pNode, cx + (*GAPPO), cy + (*GAPPO), cw - 2 * (*PBORDERSIZE), ch - 2 * (*PBORDERSIZE));
     }
+    delete[] pTempNodes;
 }
 
 void OvGridLayout::recalculateMonitor(const int &monid)
