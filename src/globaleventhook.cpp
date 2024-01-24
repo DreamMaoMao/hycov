@@ -4,7 +4,7 @@
 #include <regex>
 #include <set>
 #include <hyprland/src/SharedDefs.hpp>
-#include "GridLayout.hpp"
+#include "OvGridLayout.hpp"
 
 // std::unique_ptr<HOOK_CALLBACK_FN> mouseMoveHookPtr = std::make_unique<HOOK_CALLBACK_FN>(mouseMoveHook);
 // std::unique_ptr<HOOK_CALLBACK_FN> mouseButtonHookPtr = std::make_unique<HOOK_CALLBACK_FN>(mouseButtonHook);
@@ -122,9 +122,9 @@ static void toggle_hotarea(int x_root, int y_root)
     (g_hycov_hotarea_pos == 3 && x_root < (m_x + g_hycov_hotarea_size) && y_root < (m_y + g_hycov_hotarea_size)) ||
     (g_hycov_hotarea_pos == 4 && x_root > (m_x + m_width - g_hycov_hotarea_size) && y_root < (m_y + g_hycov_hotarea_size))))
   {
+    g_hycov_isInHotArea = true;
     hycov_log(LOG,"cursor enter hotarea");
     dispatch_toggleoverview("internalToggle");
-    g_hycov_isInHotArea = true;
   }
   else if (g_hycov_isInHotArea &&
     !((g_hycov_hotarea_pos == 1 && x_root < (m_x + g_hycov_hotarea_size) && y_root > (m_y + m_height - g_hycov_hotarea_size)) ||
@@ -132,7 +132,6 @@ static void toggle_hotarea(int x_root, int y_root)
     (g_hycov_hotarea_pos == 3 && x_root < (m_x + g_hycov_hotarea_size) && y_root < (m_y + g_hycov_hotarea_size)) ||
     (g_hycov_hotarea_pos == 4 && x_root > (m_x + m_width - g_hycov_hotarea_size) && y_root < (m_y + g_hycov_hotarea_size))))
   {
-    if(g_hycov_isInHotArea)
       g_hycov_isInHotArea = false;
   }
 }
@@ -192,8 +191,8 @@ static void hkCWindow_onUnmap(void* thisptr) {
   // after done original thing,The workspace automatically exit overview if no client exists 
   auto nodeNumInSameMonitor = 0;
   auto nodeNumInSameWorkspace = 0;
-	for (auto &n : g_hycov_GridLayout->m_lGridNodesData) {
-		if(n.pWindow->m_iMonitorID == g_pCompositor->m_pLastMonitor->ID) {
+	for (auto &n : g_hycov_OvGridLayout->m_lOvGridNodesData) {
+		if(n.pWindow->m_iMonitorID == g_pCompositor->m_pLastMonitor->ID && !g_pCompositor->isWorkspaceSpecial(n.pWindow->m_iWorkspaceID)) {
 			nodeNumInSameMonitor++;
 		}
 		if(n.pWindow->m_iWorkspaceID == g_pCompositor->m_pLastMonitor->activeWorkspace) {
@@ -380,7 +379,6 @@ void registerGlobalEventHook()
       g_hycov_pOnKeyboardKeyHook->hook();
   }
 
-  // TODO: wait hyprland to support this function hook
   // enable hook fullscreenActive funciton
   g_hycov_pFullscreenActiveHook->hook();
 }

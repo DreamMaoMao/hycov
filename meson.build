@@ -24,7 +24,7 @@ add_project_arguments(
 src = [
   'src/main.cpp',
   'src/dispatchers.cpp',
-  'src/GridLayout.cpp',
+  'src/OvGridLayout.cpp',
   'src/globaleventhook.cpp',
 ]
 

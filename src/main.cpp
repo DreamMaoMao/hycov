@@ -16,7 +16,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 	CONF("overview_gappi", int, 24);
 	CONF("hotarea_size", int, 10);
 	CONF("hotarea_monitor", str, "all");
-  CONF("hotarea_pos", int, 1);
+  	CONF("hotarea_pos", int, 1);
 	CONF("enable_hotarea", int, 1);
 	CONF("swipe_fingers", int, 4);
 	CONF("move_focus_distance", int, 100);
@@ -37,9 +37,9 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 #undef CONF
 
 	static const auto *pEnable_hotarea_config = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:enable_hotarea")->intValue;
-  static const auto *pHotarea_monitor_config = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:hotarea_monitor")->strValue;
-  static const auto *pHotarea_pos_config = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:hotarea_pos")->intValue;
-  static const auto *pHotarea_size_config = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:hotarea_size")->intValue;
+  	static const auto *pHotarea_monitor_config = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:hotarea_monitor")->strValue;
+  	static const auto *pHotarea_pos_config = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:hotarea_pos")->intValue;
+  	static const auto *pHotarea_size_config = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:hotarea_size")->intValue;
 	static const auto *pSwipe_fingers_config = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:swipe_fingers")->intValue;
 	static const auto *pMove_focus_distance_config = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:move_focus_distance")->intValue;
 	static const auto *pEnable_gesture_config = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:enable_gesture")->intValue;
@@ -75,14 +75,14 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 	g_hycov_hight_of_titlebar= *pHight_of_titlebar;
 	g_hycov_alt_replace_key = *pAlt_replace_key;
 
-	g_hycov_GridLayout = std::make_unique<GridLayout>();
-	HyprlandAPI::addLayout(PHANDLE, "grid", g_hycov_GridLayout.get());
+	g_hycov_OvGridLayout = std::make_unique<OvGridLayout>();
+	HyprlandAPI::addLayout(PHANDLE, "ovgrid", g_hycov_OvGridLayout.get());
 
 	registerGlobalEventHook();
 	registerDispatchers();
 
  	HyprlandAPI::reloadConfig();
-	return {"hycov", "clients overview", "DreamMaoMao", "0.1"};
+	return {"hycov", "overview mode", "DreamMaoMao", "0.2"};
 }
 
 APICALL EXPORT void PLUGIN_EXIT() {}

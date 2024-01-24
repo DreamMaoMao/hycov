@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
-project(Hycov VERSION "0.1")
+project(Hycov VERSION "0.2")
 set(CMAKE_CXX_STANDARD 23)
 add_compile_definitions(WLR_USE_UNSTABLE)
 add_compile_options(-g -Wall -Wextra -Wno-unused-parameter -Wno-unused-value -Wno-missing-field-initializers -Wno-narrowing -Wno-pointer-arith)
@@ -16,7 +16,7 @@ pkg_check_modules(DEPS REQUIRED hyprland pixman-1 libdrm pango pangocairo)
 add_library(hycov SHARED
 	src/main.cpp
 	src/dispatchers.cpp
-	src/GridLayout.cpp
+	src/OvGridLayout.cpp
 	src/globaleventhook.cpp
 )
 

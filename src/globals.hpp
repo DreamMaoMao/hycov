@@ -10,11 +10,11 @@
 #include <hyprland/src/managers/KeybindManager.hpp>
 #undef private
 
-#include "GridLayout.hpp"
+#include "OvGridLayout.hpp"
 
 
 inline HANDLE PHANDLE = nullptr;
-inline std::unique_ptr<GridLayout> g_hycov_GridLayout;
+inline std::unique_ptr<OvGridLayout> g_hycov_OvGridLayout;
 
 inline bool g_hycov_isOverView;
 inline bool g_hycov_isInHotArea;

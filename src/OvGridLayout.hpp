@@ -3,7 +3,7 @@
 #include <hyprland/src/layout/IHyprLayout.hpp>
 #include <hyprland/src/SharedDefs.hpp>
 
-struct SGridNodeData
+struct SOvGridNodeData
 {
   CWindow *pWindow = nullptr;
   int ovbk_windowWorkspaceId = -1;
@@ -24,18 +24,19 @@ struct SGridNodeData
 
   int workspaceID = -1;
 
-  bool operator==(const SGridNodeData &rhs) const
+  bool operator==(const SOvGridNodeData &rhs) const
   {
     return pWindow == rhs.pWindow;
   }
 };
 
-class GridLayout : public IHyprLayout
+class OvGridLayout : public IHyprLayout
 {
 public:
   virtual void onWindowCreatedTiling(CWindow *, eDirection direction = DIRECTION_DEFAULT);
   virtual void onWindowRemovedTiling(CWindow *);
   virtual bool isWindowTiled(CWindow *);
+  virtual CWindow* getNextWindowCandidate(CWindow*);
   virtual void recalculateMonitor(const int &);
   virtual void recalculateWindow(CWindow *);
   virtual void resizeActiveWindow(const Vector2D &, eRectCorner corner, CWindow *pWindow = nullptr);
@@ -49,13 +50,13 @@ public:
   virtual void moveWindowTo(CWindow *, const std::string &dir);
   virtual void onEnable();
   virtual void onDisable();
-  void applyNodeDataToWindow(SGridNodeData *);
+  void applyNodeDataToWindow(SOvGridNodeData *);
   void calculateWorkspace(const int &);
   int getNodesNumOnWorkspace(const int &);
-  SGridNodeData *getNodeFromWindow(CWindow *);
-  void resizeNodeSizePos(SGridNodeData *, int, int, int, int);
+  SOvGridNodeData *getNodeFromWindow(CWindow *);
+  void resizeNodeSizePos(SOvGridNodeData *, int, int, int, int);
   void moveWindowToWorkspaceSilent(CWindow *, const int &);
-  std::list<SGridNodeData> m_lGridNodesData; 
+  std::list<SOvGridNodeData> m_lOvGridNodesData; 
   void moveWindowToSourceWorkspace();
   void changeToActivceSourceWorkspace();
   void removeOldLayoutData(CWindow *pWindow);

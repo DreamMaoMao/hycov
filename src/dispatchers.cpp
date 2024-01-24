@@ -31,7 +31,7 @@ bool want_auto_fullscren(CWindow *pWindow) {
 		return false;
 	}
 
-	auto pNode = g_hycov_GridLayout->getNodeFromWindow(pWindow);
+	auto pNode = g_hycov_OvGridLayout->getNodeFromWindow(pWindow);
 
 	if(!pNode) {
 		return true;
@@ -43,7 +43,7 @@ bool want_auto_fullscren(CWindow *pWindow) {
 	}
 
 	// caculate the number of clients that will be in the same workspace with pWindow(don't contain itself)
-	for (auto &n : g_hycov_GridLayout->m_lGridNodesData) {
+	for (auto &n : g_hycov_OvGridLayout->m_lOvGridNodesData) {
 		if(n.pWindow != pNode->pWindow && n.ovbk_windowWorkspaceId == pNode->ovbk_windowWorkspaceId) {
 			nodeNumInTargetWorkspace++;
 		}
@@ -290,6 +290,10 @@ void dispatch_enteroverview(std::string arg)
 		return;
 	}
 
+	const auto pMonitor = g_pCompositor->m_pLastMonitor;
+	if(pMonitor->specialWorkspaceID != 0)
+		pMonitor->setSpecialWorkspace(nullptr);
+
 	if (arg == "forceall") {
 		g_hycov_forece_display_all = true;
 		hycov_log(LOG,"force display all clients");
@@ -333,8 +337,8 @@ void dispatch_enteroverview(std::string arg)
 	}
 
 	//enter overview layout
-	// g_pLayoutManager->switchToLayout("grid");
-	switchToLayoutWithoutReleaseData("grid");
+	// g_pLayoutManager->switchToLayout("ovgrid");
+	switchToLayoutWithoutReleaseData("ovgrid");
 	g_pLayoutManager->getCurrentLayout()->onEnable();
 	
 
@@ -349,9 +353,14 @@ void dispatch_enteroverview(std::string arg)
 	if(pActiveWindow){
 		g_pCompositor->focusWindow(pActiveWindow); //restore the focus to before active window
 
-	} else {
-		auto node = g_hycov_GridLayout->m_lGridNodesData.back();
-		g_pCompositor->focusWindow(node.pWindow);
+	} else { // when no window is showed in current window,find from other workspace to focus(exclude special workspace)
+    	for (auto &w : g_pCompositor->m_vWindows) {
+			CWindow *pWindow = w.get();
+    	    if (g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID) || pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut || pWindow->m_bIsFullscreen)
+    	        continue;
+			g_pCompositor->focusWindow(pWindow); // find the last window that is in same workspace with the remove window
+    	}
+
 	}
 
 	//disable changeworkspace
@@ -377,12 +386,13 @@ void dispatch_leaveoverview(std::string arg)
 	if(!g_hycov_isOverView) {
 		return;
 	}
+
+	const auto pMonitor = g_pCompositor->m_pLastMonitor;
+	if(pMonitor->specialWorkspaceID != 0)
+		pMonitor->setSpecialWorkspace(nullptr);
+	
 	// get default layout
 	std::string *configLayoutName = &HyprlandAPI::getConfigValue(PHANDLE, "general:layout")->strValue;
-
-	if(!g_hycov_isOverView){
-		return;
-	}
 	
 	hycov_log(LOG,"leave overview");
 	g_hycov_isOverView = false;
@@ -404,20 +414,20 @@ void dispatch_leaveoverview(std::string arg)
 	}
 
 	// if no clients, just exit overview, don't restore client's state
-	if (g_hycov_GridLayout->m_lGridNodesData.empty())
+	if (g_hycov_OvGridLayout->m_lOvGridNodesData.empty())
 	{
 		g_pLayoutManager->switchToLayout(*configLayoutName);	
-		g_hycov_GridLayout->m_lGridNodesData.clear();
+		g_hycov_OvGridLayout->m_lOvGridNodesData.clear();
 		g_hycov_isOverViewExiting = false;
 		return;
 	}
 
 	//move clients to it's original workspace 
-	g_hycov_GridLayout->moveWindowToSourceWorkspace();
+	g_hycov_OvGridLayout->moveWindowToSourceWorkspace();
 	// go to the workspace where the active client was before
-	g_hycov_GridLayout->changeToActivceSourceWorkspace();
+	g_hycov_OvGridLayout->changeToActivceSourceWorkspace();
 	
-	for (auto &n : g_hycov_GridLayout->m_lGridNodesData)
+	for (auto &n : g_hycov_OvGridLayout->m_lOvGridNodesData)
 	{	
 		//make all window restore it's style
     	n.pWindow->m_sSpecialRenderData.border   = n.ovbk_windowIsWithBorder;
@@ -474,14 +484,9 @@ void dispatch_leaveoverview(std::string arg)
 		} else if(g_hycov_auto_fullscreen && want_auto_fullscren(pActiveWindow)) { // if enale auto_fullscreen after exit overview
 			g_pCompositor->setWindowFullscreen(pActiveWindow,true,FULLSCREEN_MAXIMIZED);
 		}
-	} else {
-		auto node = g_hycov_GridLayout->m_lGridNodesData.back();
-		auto pActiveMonitor	= g_pCompositor->m_pLastMonitor;
-		if(node.pWindow->m_iWorkspaceID == pActiveMonitor->activeWorkspace)
-			g_pCompositor->focusWindow(node.pWindow);
 	}
 
-	for (auto &n : g_hycov_GridLayout->m_lGridNodesData)
+	for (auto &n : g_hycov_OvGridLayout->m_lOvGridNodesData)
 	{
 		//make all fullscrenn windwo restore it's status
 		if (n.ovbk_windowIsFullscreen)
@@ -504,7 +509,7 @@ void dispatch_leaveoverview(std::string arg)
 	}
 
 	//clean overview layout node date
-	g_hycov_GridLayout->m_lGridNodesData.clear();
+	g_hycov_OvGridLayout->m_lOvGridNodesData.clear();
 
 	//mark has exited overview mode
 	g_hycov_isOverViewExiting = false;
