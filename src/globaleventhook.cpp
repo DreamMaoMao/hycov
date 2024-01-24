@@ -191,7 +191,7 @@ static void hkCWindow_onUnmap(void* thisptr) {
   // after done original thing,The workspace automatically exit overview if no client exists 
   auto nodeNumInSameMonitor = 0;
   auto nodeNumInSameWorkspace = 0;
-	for (auto &n : g_hycov_OvGridLayout->m_lGridNodesData) {
+	for (auto &n : g_hycov_OvGridLayout->m_lOvGridNodesData) {
 		if(n.pWindow->m_iMonitorID == g_pCompositor->m_pLastMonitor->ID && !g_pCompositor->isWorkspaceSpecial(n.pWindow->m_iWorkspaceID)) {
 			nodeNumInSameMonitor++;
 		}

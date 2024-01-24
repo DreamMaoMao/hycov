@@ -21,7 +21,7 @@ CWindow *OvGridLayout::getNextWindowCandidate(CWindow* plastWindow) {
 
 SOvGridNodeData *OvGridLayout::getNodeFromWindow(CWindow *pWindow)
 {
-    for (auto &nd : m_lGridNodesData)
+    for (auto &nd : m_lOvGridNodesData)
     {
         if (nd.pWindow == pWindow)
             return &nd;
@@ -33,7 +33,7 @@ SOvGridNodeData *OvGridLayout::getNodeFromWindow(CWindow *pWindow)
 int OvGridLayout::getNodesNumOnWorkspace(const int &ws)
 {
     int no = 0;
-    for (auto &n : m_lGridNodesData)
+    for (auto &n : m_lOvGridNodesData)
     {
         if (n.workspaceID == ws)
             no++;
@@ -53,7 +53,7 @@ void OvGridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
 {
     const auto pMonitor = g_pCompositor->getMonitorFromID(pWindow->m_iMonitorID); 
 
-    const auto pNode = &m_lGridNodesData.emplace_back(); // make a new node in list back
+    const auto pNode = &m_lOvGridNodesData.emplace_back(); // make a new node in list back
 
     const auto pActiveWorkspace = g_pCompositor->getWorkspaceByID(pMonitor->activeWorkspace); 
 
@@ -155,9 +155,9 @@ void OvGridLayout::onWindowRemovedTiling(CWindow *pWindow)
         removeOldLayoutData(pWindow);
     }
 
-    m_lGridNodesData.remove(*pNode);
+    m_lOvGridNodesData.remove(*pNode);
 
-    if(m_lGridNodesData.empty()){
+    if(m_lOvGridNodesData.empty()){
         return;
     }
 
@@ -206,7 +206,7 @@ void OvGridLayout::calculateWorkspace(const int &ws)
     int w_width = pMonitor->vecSize.x -  pMonitor->vecReservedTopLeft.x;
     int w_height = pMonitor->vecSize.y - pMonitor->vecReservedTopLeft.y;
 
-    for (auto &node : m_lGridNodesData)
+    for (auto &node : m_lOvGridNodesData)
     {
         if (node.workspaceID == ws)
         {
@@ -400,7 +400,7 @@ void OvGridLayout::moveWindowToSourceWorkspace()
     
     hycov_log(LOG,"moveWindowToSourceWorkspace");
 
-    for (auto &nd : m_lGridNodesData)
+    for (auto &nd : m_lOvGridNodesData)
     {
         if (nd.pWindow && (nd.pWindow->m_iWorkspaceID != nd.ovbk_windowWorkspaceId || nd.workspaceName != nd.ovbk_windowWorkspaceName ))
         {

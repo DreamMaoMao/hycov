@@ -56,7 +56,7 @@ public:
   SOvGridNodeData *getNodeFromWindow(CWindow *);
   void resizeNodeSizePos(SOvGridNodeData *, int, int, int, int);
   void moveWindowToWorkspaceSilent(CWindow *, const int &);
-  std::list<SOvGridNodeData> m_lGridNodesData; 
+  std::list<SOvGridNodeData> m_lOvGridNodesData; 
   void moveWindowToSourceWorkspace();
   void changeToActivceSourceWorkspace();
   void removeOldLayoutData(CWindow *pWindow);
