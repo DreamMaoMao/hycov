@@ -501,7 +501,10 @@ void dispatch_leaveoverview(std::string arg)
 			}	
 			g_pCompositor->setWindowFullscreen(n.pWindow, true, n.ovbk_windowFullscreenMode );
 		}
-		
+	}
+
+	for (auto &n : g_hycov_OvGridLayout->m_lOvGridNodesData)
+	{
 		// if client not in old layout,create tiling of the client
 		if(!n.isInOldLayout || ( n.ovbk_size.x == 0 && n.ovbk_size.y == 0))
 		{
