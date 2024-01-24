@@ -30,6 +30,17 @@ struct SOvGridNodeData
   }
 };
 
+
+struct SOldLayoutRecordNodeData
+{
+  CWindow *pWindow = nullptr;
+  bool operator==(const SOldLayoutRecordNodeData &rhs) const
+  {
+    return pWindow == rhs.pWindow;
+  }
+};
+
+
 class OvGridLayout : public IHyprLayout
 {
 public:
@@ -54,13 +65,13 @@ public:
   void calculateWorkspace(const int &);
   int getNodesNumOnWorkspace(const int &);
   SOvGridNodeData *getNodeFromWindow(CWindow *);
+  SOldLayoutRecordNodeData *getOldLayoutRecordNodeFromWindow(CWindow *);
   void resizeNodeSizePos(SOvGridNodeData *, int, int, int, int);
   void moveWindowToWorkspaceSilent(CWindow *, const int &);
   std::list<SOvGridNodeData> m_lOvGridNodesData; 
+  std::list<SOldLayoutRecordNodeData> m_lSOldLayoutRecordNodeData; 
   void moveWindowToSourceWorkspace();
   void changeToActivceSourceWorkspace();
   void removeOldLayoutData(CWindow *pWindow);
-
-  bool isFromOnEnable = false;
 private:
 };

@@ -30,6 +30,18 @@ SOvGridNodeData *OvGridLayout::getNodeFromWindow(CWindow *pWindow)
     return nullptr;
 }
 
+
+SOldLayoutRecordNodeData *OvGridLayout::getOldLayoutRecordNodeFromWindow(CWindow *pWindow)
+{
+    for (auto &nd : m_lSOldLayoutRecordNodeData)
+    {
+        if (nd.pWindow == pWindow)
+            return &nd;
+    }
+
+    return nullptr;
+}
+
 int OvGridLayout::getNodesNumOnWorkspace(const int &ws)
 {
     int no = 0;
@@ -59,8 +71,11 @@ void OvGridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
 
     const auto pWindowOriWorkspace = g_pCompositor->getWorkspaceByID(pWindow->m_iWorkspaceID);
 
-    if(isFromOnEnable) {
+
+    auto oldLayoutRecordNode = getOldLayoutRecordNodeFromWindow(pWindow);
+    if(oldLayoutRecordNode) {
         pNode->isInOldLayout = true; //client is taken from the old layout
+        m_lSOldLayoutRecordNodeData.remove(*oldLayoutRecordNode);
     }
 
     pNode->workspaceID = pWindow->m_iWorkspaceID; // encapsulate window objects as node objects to bind more properties
@@ -84,7 +99,7 @@ void OvGridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
 
 
     //change all client(exclude special workspace) to active worksapce 
-    if ( !g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID) && isFromOnEnable && (pWindowOriWorkspace->m_iID != pActiveWorkspace->m_iID || pWindowOriWorkspace->m_szName != pActiveWorkspace->m_szName) && (!g_hycov_only_active_workspace || g_hycov_forece_display_all))    {
+    if ( !g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID) && pNode->isInOldLayout && (pWindowOriWorkspace->m_iID != pActiveWorkspace->m_iID || pWindowOriWorkspace->m_szName != pActiveWorkspace->m_szName) && (!g_hycov_only_active_workspace || g_hycov_forece_display_all))    {
         pNode->workspaceID = pWindow->m_iWorkspaceID = pActiveWorkspace->m_iID;
         pNode->workspaceName = pActiveWorkspace->m_szName;
     }
@@ -95,13 +110,10 @@ void OvGridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
     }
 
     //clean floating status(only apply to old layout window)
-    if (pWindow->m_bIsFloating && isFromOnEnable) {        
+    if (pWindow->m_bIsFloating && pNode->isInOldLayout) {        
         pWindow->m_bIsFloating = false;
         pWindow->updateDynamicRules();
     }
-
-    // reset the orig mark of window
-    isFromOnEnable = false;
 
     recalculateMonitor(pWindow->m_iMonitorID);    
 }
@@ -422,9 +434,7 @@ void OvGridLayout::onEnable()
 {
 
     for (auto &w : g_pCompositor->m_vWindows)
-    {
-        isFromOnEnable = true; //mark client is taken from the old layout
-        
+    {        
         CWindow *pWindow = w.get();
 
         if (pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut)
@@ -433,6 +443,8 @@ void OvGridLayout::onEnable()
         if(pWindow->m_iMonitorID != g_pCompositor->m_pLastMonitor->ID && (g_hycov_only_active_monitor || g_hycov_forece_display_all))
             continue;
 
+        const auto pNode = &m_lSOldLayoutRecordNodeData.emplace_back();
+        pNode->pWindow = pWindow;
         onWindowCreatedTiling(pWindow);
     }
 }

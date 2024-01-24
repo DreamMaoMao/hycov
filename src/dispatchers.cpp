@@ -503,9 +503,15 @@ void dispatch_leaveoverview(std::string arg)
 		}
 		
 		// if client not in old layout,create tiling of the client
-		if (!n.isInOldLayout || (n.ovbk_size.x == 0 && n.ovbk_size.y == 0)) {
+		if(!n.isInOldLayout || ( n.ovbk_size.x == 0 && n.ovbk_size.y == 0))
+		{
+			if (n.pWindow->m_bFadingOut || !n.pWindow->m_bIsMapped || n.pWindow->isHidden()) {
+				continue;
+			}
+			hycov_log(LOG,"create tiling window in old layout:{}",n.pWindow);
 			g_pLayoutManager->getCurrentLayout()->onWindowCreatedTiling(n.pWindow);
 		}
+
 	}
 
 	//clean overview layout node date
