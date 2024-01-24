@@ -354,11 +354,13 @@ void dispatch_enteroverview(std::string arg)
 		g_pCompositor->focusWindow(pActiveWindow); //restore the focus to before active window
 
 	} else { // when no window is showed in current window,find from other workspace to focus(exclude special workspace)
-		for (auto &n : g_hycov_OvGridLayout->m_lGridNodesData){
-			if(!g_pCompositor->isWorkspaceSpecial(n.workspaceID)) {
-				g_pCompositor->focusWindow(n.pWindow);
-			}
-		}
+    	for (auto &w : g_pCompositor->m_vWindows) {
+			CWindow *pWindow = w.get();
+    	    if (g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID) || pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut || pWindow->m_bIsFullscreen)
+    	        continue;
+			g_pCompositor->focusWindow(pWindow); // find the last window that is in same workspace with the remove window
+    	}
+
 	}
 
 	//disable changeworkspace
