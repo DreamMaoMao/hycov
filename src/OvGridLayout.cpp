@@ -149,8 +149,6 @@ void OvGridLayout::onWindowRemovedTiling(CWindow *pWindow)
     if (!pNode)
         return;
 
-    auto currentWorkspaceID = pWindow->m_iWorkspaceID;
-
     if(pNode->isInOldLayout) { // if client is taken from the old layout
         removeOldLayoutData(pWindow);
     }
