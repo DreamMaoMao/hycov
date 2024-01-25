@@ -158,6 +158,7 @@ static void hkCInputManager_onMouseButton(void* thisptr, wlr_pointer_button_even
     }
 
     if(!pTargetWindow) {
+      (*(origCInputManager_onMouseButton)g_hycov_pCInputManager_onMouseButton->m_pOriginal)(thisptr, e);
       return;
     } 
 
