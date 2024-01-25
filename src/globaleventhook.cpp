@@ -237,7 +237,7 @@ static void hkStartAnim(void* thisptr,bool in, bool left, bool instant = false) 
     hycov_log(LOG,"hook startAnim,disable workspace change anim,in:{},isOverview:{}",in,g_hycov_isOverView);
   } else {
     (*(origStartAnim)g_hycov_pStartAnimHook->m_pOriginal)(thisptr, in, left, instant);
-    hycov_log(LOG,"hook startAnim,enable workspace change anim,in:{},isOverview:{}",in,g_hycov_isOverView);
+    // hycov_log(LOG,"hook startAnim,enable workspace change anim,in:{},isOverview:{}",in,g_hycov_isOverView);
   }
 }
 
