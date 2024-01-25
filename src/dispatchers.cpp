@@ -70,18 +70,22 @@ std::optional<ShiftDirection> parseShiftArg(std::string arg) {
 }
 
 CWindow *direction_select(std::string arg){
-	CWindow *pTempCWindows[100];
 	CWindow *pTempClient =  g_pCompositor->m_pLastWindow;
+	auto dataSize =  g_pCompositor->m_vWindows.size();
+	auto pTempCWindows = new CWindow*[dataSize + 1];
 	CWindow *pTempFocusCWindows = nullptr;
 	int last = -1;
 	if(!pTempClient){
+		delete[] pTempCWindows;
 		return nullptr;
 	}else if (pTempClient->m_bIsFullscreen){
+		delete[] pTempCWindows;
 		return nullptr;
 	}
 
     if (!isDirection(arg)) {
         hycov_log(ERR, "Cannot move focus in direction {}, unsupported direction. Supported: l/left,r/right,u/up,d/down", arg);
+		delete[] pTempCWindows;
         return nullptr;
     }
 
@@ -94,8 +98,10 @@ CWindow *direction_select(std::string arg){
 			pTempCWindows[last] = pWindow;			
     }
 	
-  	if (last < 0)
-  	  return nullptr;
+  	if (last < 0) {
+		delete[] pTempCWindows;
+  		return nullptr;
+	}
   	int sel_x = pTempClient->m_vRealPosition.goalv().x;
   	int sel_y = pTempClient->m_vRealPosition.goalv().y;
   	long long int distance = LLONG_MAX;;
@@ -213,6 +219,7 @@ CWindow *direction_select(std::string arg){
 		}
   		break;
   	}
+	delete[] pTempCWindows;
   	return pTempFocusCWindows;
 }
 

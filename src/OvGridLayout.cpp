@@ -184,7 +184,7 @@ void OvGridLayout::calculateWorkspace(const int &ws)
 {
     const auto pWorksapce = g_pCompositor->getWorkspaceByID(ws); 
     auto dataSize = m_lOvGridNodesData.size();
-    auto pTempNodes = new SOvGridNodeData*[dataSize+1];
+    auto pTempNodes = new SOvGridNodeData*[dataSize + 1];
     SOvGridNodeData *pNode;
     int i, n = 0;
     int cx, cy;
