@@ -502,7 +502,12 @@ void dispatch_leaveoverview(std::string arg)
 
 	//Preserve window focus
 	if(pActiveWindow){
-		g_pCompositor->focusWindow(pActiveWindow); //restore the focus to before active window
+		if(g_hycov_forece_display_all_in_one_monitor && pActiveWindow->m_iMonitorID != g_pCompositor->m_pLastMonitor->ID) {
+			warpcursor_and_focus_to_window(pActiveWindow); //restore the focus to before active window.when cross monitor,warpcursor to monitor of current active window is in
+		} else {
+			g_pCompositor->focusWindow(pActiveWindow); //restore the focus to before active window
+		}
+
 		if(pActiveWindow->m_bIsFloating) {
 			g_pCompositor->changeWindowZOrder(pActiveWindow, true);
 		} else if(g_hycov_auto_fullscreen && want_auto_fullscren(pActiveWindow)) { // if enale auto_fullscreen after exit overview
