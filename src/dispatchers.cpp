@@ -301,10 +301,24 @@ void dispatch_enteroverview(std::string arg)
 	if(pMonitor->specialWorkspaceID != 0)
 		pMonitor->setSpecialWorkspace(nullptr);
 
+	//force display all workspace window,ignore `only_active_worksapce` and `only_active_monitor`
 	if (arg == "forceall") {
 		g_hycov_forece_display_all = true;
 		hycov_log(LOG,"force display all clients");
+	} else {
+		g_hycov_forece_display_all = false;
 	}
+
+
+	//force display all workspace window in one monitor,ignore `only_active_worksapce` and `only_active_monitor`
+	if (arg == "forceallinone") {
+		g_hycov_forece_display_all_in_one_monitor = true;
+		hycov_log(LOG,"force display all clients in one monitor");
+	} else {
+		g_hycov_forece_display_all_in_one_monitor = false;
+	}
+
+
 	//ali clients exit fullscreen status before enter overview
 	CWindow *pFullscreenWindow;
 	CWindow *pActiveWindow = g_pCompositor->m_pLastWindow;
@@ -379,10 +393,6 @@ void dispatch_enteroverview(std::string arg)
 	//disable spawn
 	if(g_hycov_disable_spawn) {
 		g_hycov_pSpawnHook->hook();
-	}
-
-	if (arg == "forceall") {
-		g_hycov_forece_display_all = false;
 	}
 
 	return;
@@ -541,7 +551,6 @@ void dispatch_leaveoverview(std::string arg)
 
 void registerDispatchers()
 {
-	g_hycov_forece_display_all = false;
 	HyprlandAPI::addDispatcher(PHANDLE, "hycov:enteroverview", dispatch_enteroverview);
 	HyprlandAPI::addDispatcher(PHANDLE, "hycov:leaveoverview", dispatch_leaveoverview);
 	HyprlandAPI::addDispatcher(PHANDLE, "hycov:toggleoverview", dispatch_toggleoverview);
