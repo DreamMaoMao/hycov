@@ -433,7 +433,8 @@ void dispatch_leaveoverview(std::string arg)
 	// if no clients, just exit overview, don't restore client's state
 	if (g_hycov_OvGridLayout->m_lOvGridNodesData.empty())
 	{
-		g_pLayoutManager->switchToLayout(*configLayoutName);	
+		switchToLayoutWithoutReleaseData(*configLayoutName);
+		recalculateAllMonitor();
 		g_hycov_OvGridLayout->m_lOvGridNodesData.clear();
 		g_hycov_isOverViewExiting = false;
 		return;
@@ -496,7 +497,7 @@ void dispatch_leaveoverview(std::string arg)
 	CWindow *pActiveWindow = g_pCompositor->m_pLastWindow;
 	g_pCompositor->focusWindow(nullptr);
 	// g_pLayoutManager->switchToLayout(*configLayoutName);
-	g_pLayoutManager->getCurrentLayout()->onDisable();
+	// g_pLayoutManager->getCurrentLayout()->onDisable();
 	switchToLayoutWithoutReleaseData(*configLayoutName);
 	recalculateAllMonitor();
 
