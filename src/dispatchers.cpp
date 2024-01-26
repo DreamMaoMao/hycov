@@ -301,10 +301,24 @@ void dispatch_enteroverview(std::string arg)
 	if(pMonitor->specialWorkspaceID != 0)
 		pMonitor->setSpecialWorkspace(nullptr);
 
+	//force display all workspace window,ignore `only_active_worksapce` and `only_active_monitor`
 	if (arg == "forceall") {
 		g_hycov_forece_display_all = true;
 		hycov_log(LOG,"force display all clients");
+	} else {
+		g_hycov_forece_display_all = false;
 	}
+
+
+	//force display all workspace window in one monitor,ignore `only_active_worksapce` and `only_active_monitor`
+	if (arg == "forceallinone") {
+		g_hycov_forece_display_all_in_one_monitor = true;
+		hycov_log(LOG,"force display all clients in one monitor");
+	} else {
+		g_hycov_forece_display_all_in_one_monitor = false;
+	}
+
+
 	//ali clients exit fullscreen status before enter overview
 	CWindow *pFullscreenWindow;
 	CWindow *pActiveWindow = g_pCompositor->m_pLastWindow;
@@ -381,10 +395,6 @@ void dispatch_enteroverview(std::string arg)
 		g_hycov_pSpawnHook->hook();
 	}
 
-	if (arg == "forceall") {
-		g_hycov_forece_display_all = false;
-	}
-
 	return;
 }
 
@@ -423,7 +433,8 @@ void dispatch_leaveoverview(std::string arg)
 	// if no clients, just exit overview, don't restore client's state
 	if (g_hycov_OvGridLayout->m_lOvGridNodesData.empty())
 	{
-		g_pLayoutManager->switchToLayout(*configLayoutName);	
+		switchToLayoutWithoutReleaseData(*configLayoutName);
+		recalculateAllMonitor();
 		g_hycov_OvGridLayout->m_lOvGridNodesData.clear();
 		g_hycov_isOverViewExiting = false;
 		return;
@@ -486,13 +497,18 @@ void dispatch_leaveoverview(std::string arg)
 	CWindow *pActiveWindow = g_pCompositor->m_pLastWindow;
 	g_pCompositor->focusWindow(nullptr);
 	// g_pLayoutManager->switchToLayout(*configLayoutName);
-	g_pLayoutManager->getCurrentLayout()->onDisable();
+	// g_pLayoutManager->getCurrentLayout()->onDisable();
 	switchToLayoutWithoutReleaseData(*configLayoutName);
 	recalculateAllMonitor();
 
 	//Preserve window focus
 	if(pActiveWindow){
-		g_pCompositor->focusWindow(pActiveWindow); //restore the focus to before active window
+		if(g_hycov_forece_display_all_in_one_monitor && pActiveWindow->m_iMonitorID != g_pCompositor->m_pLastMonitor->ID) {
+			warpcursor_and_focus_to_window(pActiveWindow); //restore the focus to before active window.when cross monitor,warpcursor to monitor of current active window is in
+		} else {
+			g_pCompositor->focusWindow(pActiveWindow); //restore the focus to before active window
+		}
+
 		if(pActiveWindow->m_bIsFloating) {
 			g_pCompositor->changeWindowZOrder(pActiveWindow, true);
 		} else if(g_hycov_auto_fullscreen && want_auto_fullscren(pActiveWindow)) { // if enale auto_fullscreen after exit overview
@@ -541,7 +557,6 @@ void dispatch_leaveoverview(std::string arg)
 
 void registerDispatchers()
 {
-	g_hycov_forece_display_all = false;
 	HyprlandAPI::addDispatcher(PHANDLE, "hycov:enteroverview", dispatch_enteroverview);
 	HyprlandAPI::addDispatcher(PHANDLE, "hycov:leaveoverview", dispatch_leaveoverview);
 	HyprlandAPI::addDispatcher(PHANDLE, "hycov:toggleoverview", dispatch_toggleoverview);

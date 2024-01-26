@@ -39,7 +39,8 @@ inline int g_hycov_hight_of_titlebar;
 inline std::string g_hycov_alt_replace_key;
 
 inline bool g_hycov_isOverViewExiting;
-inline bool g_hycov_forece_display_all;
+inline bool g_hycov_forece_display_all = false;
+inline bool g_hycov_forece_display_all_in_one_monitor = false;
 
 inline CFunctionHook* g_hycov_pOnSwipeBeginHook = nullptr;
 inline CFunctionHook* g_hycov_pOnSwipeEndHook = nullptr;

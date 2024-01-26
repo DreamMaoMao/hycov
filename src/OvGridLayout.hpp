@@ -8,6 +8,7 @@ struct SOvGridNodeData
   CWindow *pWindow = nullptr;
   int ovbk_windowWorkspaceId = -1;
   std::string ovbk_windowWorkspaceName;
+  int ovbk_windowMonitorId = -1;
   std::string workspaceName;
   bool ovbk_windowIsFloating = false;
   bool ovbk_windowIsFullscreen = false;

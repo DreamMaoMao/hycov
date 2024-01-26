@@ -52,8 +52,12 @@ plugin = /usr/lib/libhycov.so
 
 # bind key to toggle overview(normal mode)
 bind = ALT,tab,hycov:toggleoverview
+
 # bind key to toggle overview(force mode,no affected by `only_active_workspace` and `only_active_monitor`)
 bind = ALT,grave,hycov:toggleoverview,forceall #grave key is the '~' key
+
+# bind key to toggle overview(show all window in one monitor,no affected by `only_active_workspace` and `only_active_monitor`)
+bind = ALT,g,hycov:toggleoverview,forceallinone 
 
 # The direction switch shortcut key binding.
 # calculate the window closest to the direction to switch focus.
