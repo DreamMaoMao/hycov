@@ -281,7 +281,7 @@ void dispatch_toggleoverview(std::string arg)
 	} else if (g_hycov_isOverView && g_hycov_enable_alt_release_exit && arg != "internalToggle") {
 		dispatch_circle("");
 		hycov_log(LOG,"toggle overview:switch focus circlely");
-	} else if(g_hycov_enable_alt_release_exit && g_hycov_alt_toggle_auto_next) {
+	} else if(g_hycov_enable_alt_release_exit && g_hycov_alt_toggle_auto_next && arg != "internalToggle") {
 		dispatch_enteroverview(arg);
 		dispatch_circle("");
 		hycov_log(LOG,"enter overview:alt switch mode auto next");
