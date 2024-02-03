@@ -336,8 +336,9 @@ void registerGlobalEventHook()
   g_hycov_pSDwindleNodeData_recalcSizePosRecursive = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&SDwindleNodeData::recalcSizePosRecursive, (void*)&hkSDwindleNodeData_recalcSizePosRecursive);
 
 
-  //mousebutto
+  //mousebutton
   g_hycov_pCInputManager_onMouseButton = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::onMouseButton, (void*)&hkCInputManager_onMouseButton);
+  g_hycov_pCInputManager_onMouseButton->hook();
 
   //create private function hook
 
@@ -359,7 +360,6 @@ void registerGlobalEventHook()
 
   //register pEvent hook
   if(g_hycov_enable_hotarea){
-    g_hycov_pCInputManager_onMouseButton->hook();
     HyprlandAPI::registerCallbackDynamic(PHANDLE, "mouseMove",[&](void* self, SCallbackInfo& info, std::any data) { mouseMoveHook(self, info, data); });
   }
 
