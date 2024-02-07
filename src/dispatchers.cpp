@@ -357,11 +357,6 @@ void dispatch_enteroverview(std::string arg)
 		}
 	}
 
-	//enter overview layout
-	// g_pLayoutManager->switchToLayout("ovgrid");
-	switchToLayoutWithoutReleaseData("ovgrid");
-	g_pLayoutManager->getCurrentLayout()->onEnable();
-	
 
 	//change workspace name to OVERVIEW
 	pActiveMonitor	= g_pCompositor->m_pLastMonitor;
@@ -370,6 +365,12 @@ void dispatch_enteroverview(std::string arg)
 	workspaceIdBackup = pActiveWorkspace->m_iID;
 	g_pCompositor->renameWorkspace(pActiveMonitor->activeWorkspace,overviewWorksapceName);
 
+
+	//enter overview layout
+	// g_pLayoutManager->switchToLayout("ovgrid");
+	switchToLayoutWithoutReleaseData("ovgrid");
+	g_pLayoutManager->getCurrentLayout()->onEnable();
+	
 	//Preserve window focus
 	if(pActiveWindow){
 		g_pCompositor->focusWindow(pActiveWindow); //restore the focus to before active window

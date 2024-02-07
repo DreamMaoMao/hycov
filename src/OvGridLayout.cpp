@@ -328,6 +328,8 @@ void OvGridLayout::applyNodeDataToWindow(SOvGridNodeData *pNode)
 
     const auto pWindow = pNode->pWindow;
 
+    const auto WORKSPACERULE = g_pConfigManager->getWorkspaceRuleFor(g_pCompositor->getWorkspaceByID(pWindow->m_iWorkspaceID));
+    pWindow->updateSpecialRenderData();
     // force disable decorate and shadow
     // pWindow->m_sSpecialRenderData.decorate = false;
     // pWindow->m_sSpecialRenderData.shadow   = false;
@@ -335,6 +337,7 @@ void OvGridLayout::applyNodeDataToWindow(SOvGridNodeData *pNode)
     // force enable bordear and rounding
     pWindow->m_sSpecialRenderData.border   = true;
     pWindow->m_sSpecialRenderData.rounding = true;
+    pWindow->m_sSpecialRenderData.borderSize = WORKSPACERULE.borderSize.value_or(-1);
 
     pWindow->m_vSize = pNode->size;
     pWindow->m_vPosition = pNode->position;
