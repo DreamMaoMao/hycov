@@ -55,10 +55,10 @@ hyrppm enable hycov
 ```conf
 # When entering overview mode, you can use left-button to jump, right-button to kill or use keybind
 
-#  If you are installing with hyprpm, you should comment out this sentence
+#  If you are installing hycov with hyprpm, you should comment out this 
 plugin = /usr/lib/libhycov.so
 
-# If you manually compile the hycov installation you should comment out this sentence
+# If you are installing hycov by manually compile , you should comment out this 
 exec-once = hyprpm reload
 
 # bind key to toggle overview (normal)
