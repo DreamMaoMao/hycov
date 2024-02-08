@@ -1,16 +1,16 @@
-## hycov
-hyprland overview mode plugin,a new tile window workflow  
+# hycov
+A Hyprland overview mode plugin, a new tiling WM workflow.  
 
-### what can it do:
-- Tile all workspace windows in one workspace by grid layout
+### What can it do?
+- Hycov can tile all of your windows in a single workspace via grid layout.
 
-- After quit the overview mode, it can perfect recovery window state (fullscreen, floating, the size, position)
+- After quitting the overview mode, hycov can perfectly recover a window's previous state (fullscreen, floating, size, positon, etc.)
 
-- Support a variety of trigger methods, touch pad gestures, mouse screen hot area, shortcut keys
+- Hycov supports a variety of trigger methods, such as touch pad gestures, hot corners, and keyboard shortcuts.
 
-- Support for multiple monitors
+- Supports multiple monitors.
 
-- Supports a variety of focus switching modes, direction switching, single shortcut key cyclic switching
+- You can change the way that Hycov focuses a window, whether directional or cyclical. (single-shortcut)
 
 https://github.com/DreamMaoMao/hycov/assets/30348075/59121362-21a8-4143-be95-72ce79ee8e95
 
@@ -19,14 +19,12 @@ Anyone is welcome to fork. If you end up improving the plugin, please let me kno
 
 ### Manual Installation
 
-##### something need to notice
-1.You need to manually relogin after it is installed. 
-after the installation is complete, it may also trigger logout if you do not logout which is normal.
+##### NOTE:
+1. After Hycov is installed, you will need to logout, then log back in. This may happen automatically, but do not worry. This behaviour is normal.
 
-2.Only supports hyprland source code after 2023-10-22.
-because the plugin requires this [commit](https://github.com/hyprwm/Hyprland/commit/a61eb7694df25a75f45502ed64b1536fda370c1d) in hyprland(was commited in 2023-10-21)
+2. Only supports hyprland source code after 2023-10-22, because the plugin requires this [commit](https://github.com/hyprwm/Hyprland/commit/a61eb7694df25a75f45502ed64b1536fda370c1d) in [hyprland](https://github.com/hyprwm/Hyprland).
 
-##### using meson and ninja:
+##### Using meson and ninja:
 
 ```shell
 git clone https://github.com/DreamMaoMao/hycov.git
@@ -36,7 +34,7 @@ sudo ninja -C build
 sudo ninja -C build install # `libhycov.so` path: /usr/lib/libhycov.so
 ```
 
-##### using cmake:
+##### Using CMake:
 
 ```shell
 git clone https://github.com/DreamMaoMao/hycov.git
@@ -47,21 +45,21 @@ bash install.sh # `libhycov.so` path: /usr/lib/libhycov.so
 ### Usage (hyprland.conf)
 
 ```conf
-# when enter overview, you can use left-button to jump, right-button to kill or use keybind
+# When entering overview mode, you can use left-button to jump, right-button to kill or use keybind
 plugin = /usr/lib/libhycov.so
 
-# bind key to toggle overview(normal mode)
+# bind key to toggle overview (normal)
 bind = ALT,tab,hycov:toggleoverview
 
-# bind key to toggle overview(force mode,no affected by `only_active_workspace` and `only_active_monitor`)
+# bind key to toggle overview (force mode, not affected by `only_active_workspace` or `only_active_monitor`)
 bind = ALT,grave,hycov:toggleoverview,forceall #grave key is the '~' key
 
-# bind key to toggle overview(show all window in one monitor,no affected by `only_active_workspace` and `only_active_monitor`)
+# bind key to toggle overview (shows all windows in one monitor, not affected by `only_active_workspace` or `only_active_monitor`)
 bind = ALT,g,hycov:toggleoverview,forceallinone 
 
-# The direction switch shortcut key binding.
-# calculate the window closest to the direction to switch focus.
-# This keybind is applicable not only to the overview  but also to the general layout
+# The key binding for directional switch mode.
+# Calculate the window closest to the direction to switch focus.
+# This keybind is applicable not only to the overview, but also to the general layout.
 bind=ALT,left,hycov:movefocus,l
 bind=ALT,right,hycov:movefocus,r
 bind=ALT,up,hycov:movefocus,u
