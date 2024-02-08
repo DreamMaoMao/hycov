@@ -47,7 +47,7 @@ bash install.sh # `libhycov.so` path: /usr/lib/libhycov.so
 ```shell
 hyprpm update
 hyprpm add https://github.com/DreamMaoMao/hycov
-hyrppm enable hycov
+hyprpm enable hycov
 ```
 
 ### Usage (hyprland.conf)
