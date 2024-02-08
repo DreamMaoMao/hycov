@@ -42,11 +42,24 @@ cd hycov
 bash install.sh # `libhycov.so` path: /usr/lib/libhycov.so
 ```
 
+##### Using hyprpm:
+
+```shell
+hyprpm update
+hyprpm add https://github.com/DreamMaoMao/hycov
+hyrppm enable hycov
+```
+
 ### Usage (hyprland.conf)
 
 ```conf
 # When entering overview mode, you can use left-button to jump, right-button to kill or use keybind
+
+#  If you are installing with hyprpm, you should comment out this sentence
 plugin = /usr/lib/libhycov.so
+
+# If you manually compile the hycov installation you should comment out this sentence
+exec-once = hyprpm reload
 
 # bind key to toggle overview (normal)
 bind = ALT,tab,hycov:toggleoverview
