@@ -1,6 +1,6 @@
 [hycov]
 description = "hyprland overview mode"
-version = "0.2"
+version = "0.3"
 author = "DreamMaoMao"
 
 [hycov.build]

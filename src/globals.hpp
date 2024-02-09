@@ -37,6 +37,10 @@ inline int g_hycov_alt_toggle_auto_next;
 inline int g_hycov_click_in_cursor;
 inline int g_hycov_hight_of_titlebar;
 inline std::string g_hycov_alt_replace_key;
+inline int g_hycov_bordersize;
+inline int g_hycov_overview_gappo;
+inline int g_hycov_overview_gappi;
+inline std::string g_hycov_configLayoutName;
 
 inline bool g_hycov_isOverViewExiting;
 inline bool g_hycov_forece_display_all = false;

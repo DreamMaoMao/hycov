@@ -409,9 +409,6 @@ void dispatch_leaveoverview(std::string arg)
 	if(pMonitor->specialWorkspaceID != 0)
 		pMonitor->setSpecialWorkspace(nullptr);
 	
-	// get default layout
-	std::string *configLayoutName = &HyprlandAPI::getConfigValue(PHANDLE, "general:layout")->strValue;
-	
 	hycov_log(LOG,"leave overview");
 	g_hycov_isOverView = false;
 	//mark exiting overview mode
@@ -434,7 +431,7 @@ void dispatch_leaveoverview(std::string arg)
 	// if no clients, just exit overview, don't restore client's state
 	if (g_hycov_OvGridLayout->m_lOvGridNodesData.empty())
 	{
-		switchToLayoutWithoutReleaseData(*configLayoutName);
+		switchToLayoutWithoutReleaseData(g_hycov_configLayoutName);
 		recalculateAllMonitor();
 		g_hycov_OvGridLayout->m_lOvGridNodesData.clear();
 		g_hycov_isOverViewExiting = false;
@@ -497,9 +494,9 @@ void dispatch_leaveoverview(std::string arg)
 	//exit overview layout,go back to old layout
 	CWindow *pActiveWindow = g_pCompositor->m_pLastWindow;
 	g_pCompositor->focusWindow(nullptr);
-	// g_pLayoutManager->switchToLayout(*configLayoutName);
+	// g_pLayoutManager->switchToLayout(g_hycov_configLayoutName);
 	// g_pLayoutManager->getCurrentLayout()->onDisable();
-	switchToLayoutWithoutReleaseData(*configLayoutName);
+	switchToLayoutWithoutReleaseData(g_hycov_configLayoutName);
 	recalculateAllMonitor();
 
 	//Preserve window focus

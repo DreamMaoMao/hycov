@@ -128,11 +128,10 @@ void OvGridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
 
 void OvGridLayout::removeOldLayoutData(CWindow *pWindow) { 
 
-	std::string *configLayoutName = &HyprlandAPI::getConfigValue(PHANDLE, "general:layout")->strValue;
-    switchToLayoutWithoutReleaseData(*configLayoutName);
-    hycov_log(LOG,"remove data of old layout:{}",*configLayoutName);
+    switchToLayoutWithoutReleaseData(g_hycov_configLayoutName);
+    hycov_log(LOG,"remove data of old layout:{}",g_hycov_configLayoutName);
 
-    if(*configLayoutName == "dwindle") {
+    if(g_hycov_configLayoutName == "dwindle") {
         // disable render client of old layout
         g_hycov_pHyprDwindleLayout_recalculateMonitor->hook();
         g_hycov_pHyprDwindleLayout_recalculateWindow->hook();
@@ -144,7 +143,7 @@ void OvGridLayout::removeOldLayoutData(CWindow *pWindow) {
         g_hycov_pSDwindleNodeData_recalcSizePosRecursive->unhook();
         g_hycov_pHyprDwindleLayout_recalculateWindow->unhook();
         g_hycov_pHyprDwindleLayout_recalculateMonitor->unhook();
-    } else if(*configLayoutName == "master") {
+    } else if(g_hycov_configLayoutName == "master") {
         g_hycov_pHyprMasterLayout_recalculateMonitor->hook();
 
         g_pLayoutManager->getCurrentLayout()->onWindowRemovedTiling(pWindow);
@@ -152,7 +151,7 @@ void OvGridLayout::removeOldLayoutData(CWindow *pWindow) {
         g_hycov_pHyprMasterLayout_recalculateMonitor->unhook();
     } else {
         // may be not support other layout
-        hycov_log(ERR,"unknow old layout:{}",*configLayoutName);
+        hycov_log(ERR,"unknow old layout:{}",g_hycov_configLayoutName);
         g_pLayoutManager->getCurrentLayout()->onWindowRemovedTiling(pWindow);
     }
 
@@ -211,10 +210,6 @@ void OvGridLayout::calculateWorkspace(const int &ws)
         return;
     }
 
-    static const auto *PBORDERSIZE = &HyprlandAPI::getConfigValue(PHANDLE, "general:border_size")->intValue;
-    static const auto *GAPPO = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:overview_gappo")->intValue;
-    static const auto *GAPPI = &HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:overview_gappi")->intValue;
-
     /*
     m is region that is moniotr,
     w is region that is monitor but don not contain bar  
@@ -248,10 +243,10 @@ void OvGridLayout::calculateWorkspace(const int &ws)
     if (NODECOUNT == 1)
     {
         pNode = pTempNodes[0];
-        cw = (w_width - 2 * (*GAPPO)) * 0.7;
-        ch = (w_height - 2 * (*GAPPO)) * 0.8;
+        cw = (w_width - 2 * (g_hycov_overview_gappo)) * 0.7;
+        ch = (w_height - 2 * (g_hycov_overview_gappo)) * 0.8;
         resizeNodeSizePos(pNode, w_x + (int)((m_width - cw) / 2), w_y + (int)((w_height - ch) / 2),
-                          cw - 2 * (*PBORDERSIZE), ch - 2 * (*PBORDERSIZE));
+                          cw - 2 * (g_hycov_bordersize), ch - 2 * (g_hycov_bordersize));
         delete[] pTempNodes;
         return;
     }
@@ -260,12 +255,12 @@ void OvGridLayout::calculateWorkspace(const int &ws)
     if (NODECOUNT == 2)
     {
         pNode = pTempNodes[0];
-        cw = (w_width - 2 * (*GAPPO) - (*GAPPI)) / 2;
-        ch = (w_height - 2 * (*GAPPO)) * 0.65;
-        resizeNodeSizePos(pNode, m_x + cw + (*GAPPO) + (*GAPPI), m_y + (m_height - ch) / 2 + (*GAPPO),
-                          cw - 2 * (*PBORDERSIZE), ch - 2 * (*PBORDERSIZE));
-        resizeNodeSizePos(pTempNodes[1], m_x + (*GAPPO), m_y + (m_height - ch) / 2 + (*GAPPO),
-                          cw - 2 * (*PBORDERSIZE), ch - 2 * (*PBORDERSIZE));
+        cw = (w_width - 2 * (g_hycov_overview_gappo) - (g_hycov_overview_gappi)) / 2;
+        ch = (w_height - 2 * (g_hycov_overview_gappo)) * 0.65;
+        resizeNodeSizePos(pNode, m_x + cw + (g_hycov_overview_gappo) + (g_hycov_overview_gappi), m_y + (m_height - ch) / 2 + (g_hycov_overview_gappo),
+                          cw - 2 * (g_hycov_bordersize), ch - 2 * (g_hycov_bordersize));
+        resizeNodeSizePos(pTempNodes[1], m_x + (g_hycov_overview_gappo), m_y + (m_height - ch) / 2 + (g_hycov_overview_gappo),
+                          cw - 2 * (g_hycov_bordersize), ch - 2 * (g_hycov_bordersize));
         delete[] pTempNodes;
         return;
     }
@@ -283,24 +278,24 @@ void OvGridLayout::calculateWorkspace(const int &ws)
 
     //Calculate the width and height of the layout area based on 
     //the number of rows and columns
-    ch = (int)((w_height - 2 * (*GAPPO) - (rows - 1) * (*GAPPI)) / rows);
-    cw = (int)((w_width - 2 * (*GAPPO) - (cols - 1) * (*GAPPI)) / cols);
+    ch = (int)((w_height - 2 * (g_hycov_overview_gappo) - (rows - 1) * (g_hycov_overview_gappi)) / rows);
+    cw = (int)((w_width - 2 * (g_hycov_overview_gappo) - (cols - 1) * (g_hycov_overview_gappi)) / cols);
 
     //If the nodes do not exactly fill all rows, 
     //the number of Windows in the unfilled rows is
     overcols = NODECOUNT % cols;
 
     if (overcols)
-        dx = (int)((w_width - overcols * cw - (overcols - 1) * (*GAPPI)) / 2) - (*GAPPO);
+        dx = (int)((w_width - overcols * cw - (overcols - 1) * (g_hycov_overview_gappi)) / 2) - (g_hycov_overview_gappo);
     for (i = 0, pNode = pTempNodes[0]; pNode; pNode = pTempNodes[i + 1], i++)
     {
-        cx = w_x + (i % cols) * (cw + (*GAPPI));
-        cy = w_y + (int)(i / cols) * (ch + (*GAPPI));
+        cx = w_x + (i % cols) * (cw + (g_hycov_overview_gappi));
+        cy = w_y + (int)(i / cols) * (ch + (g_hycov_overview_gappi));
         if (overcols && i >= (NODECOUNT-overcols))
         {
             cx += dx;
         }
-        resizeNodeSizePos(pNode, cx + (*GAPPO), cy + (*GAPPO), cw - 2 * (*PBORDERSIZE), ch - 2 * (*PBORDERSIZE));
+        resizeNodeSizePos(pNode, cx + (g_hycov_overview_gappo), cy + (g_hycov_overview_gappo), cw - 2 * (g_hycov_bordersize), ch - 2 * (g_hycov_bordersize));
     }
     delete[] pTempNodes;
 }
