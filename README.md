@@ -53,21 +53,26 @@ hyprpm enable hycov
 ### Usage (hyprland.conf)
 
 ```conf
-# When entering overview mode, you can use left-button to jump, right-button to kill or use keybind
+# When entering overview mode, you can use left mouse button to jump, right mouse button to kill or use keybind
 
-#  If you are installing hycov with hyprpm, you should comment out this 
+# If you are installing hycov with hyprpm you should not use this line.
+# If you are using the NixOS flake you should not use this line.
 plugin = /usr/lib/libhycov.so
 
-# If you are installing hycov by manually compile , you should comment out this 
+# If you manually compiled hycov you should not use this line.
 exec-once = hyprpm reload
 
-# bind key to toggle overview (normal)
+# If you wish to bind a different key than ALT make sure you change the key using the `alt_replace_key` aswell as changing the binding.
+
+# Toggle overview with all clients from all monitors.
 bind = ALT,tab,hycov:toggleoverview
 
-# bind key to toggle overview (force mode, not affected by `only_active_workspace` or `only_active_monitor`)
+# Toggle overview with all clients from all monitors on their respective monitors. 
+# Using this mode will invalidate the usage of the `only_active_workspace` or `only_active_monitor` options.
 bind = ALT,grave,hycov:toggleoverview,forceall #grave key is the '~' key
 
-# bind key to toggle overview (shows all windows in one monitor, not affected by `only_active_workspace` or `only_active_monitor`)
+# Toggle overview on the active monitor with all clients from all monitors. 
+# Using this mode will invalidate the usage of the `only_active_workspace` or `only_active_monitor` options.
 bind = ALT,g,hycov:toggleoverview,forceallinone 
 
 # The key binding for directional switch mode.
@@ -80,24 +85,28 @@ bind=ALT,down,hycov:movefocus,d
 
 plugin {
     hycov {
-        overview_gappo = 60 # gaps width from screen edge
-        overview_gappi = 24 # gaps width from clients
-        enable_hotarea = 1 # enable mouse cursor hotarea, when cursor enter hotarea, it will toggle overview    
-        hotarea_monitor = all # monitor name which hotarea is in, default is all
+        overview_gappo = 60 # Gaps between the outside of clients and the edge of the screen
+        overview_gappi = 24 # Gaps between clients
+        # Hotarea
+        enable_hotarea = 1 # Enable "hotarea". When you cursor enters the hotarea it will trigger overview mode. (Not reccomended if you play games as it can still trigger whilst the game is open)
+        hotarea_monitor = all # Monitor name which hotarea is in, default is all
         hotarea_pos = 1 # position of hotarea (1: bottom left, 2: bottom right, 3: top left, 4: top right)
         hotarea_size = 10 # hotarea size, 10x10
+        # Trackpad gestures
         swipe_fingers = 4 # finger number of gesture,move any directory
         move_focus_distance = 100 # distance for movefocus,only can use 3 finger to move 
         enable_gesture = 0 # enable gesture
+
         disable_workspace_change = 0 # disable workspace change when in overview mode
         disable_spawn = 0 # disable bind exec when in overview mode
-        auto_exit = 1 # enable auto exit when no client in overview
-        auto_fullscreen = 0 # auto make active window maximize after exit overview
-        only_active_workspace = 0 # only overview the active workspace
-        only_active_monitor = 0 # only overview the active monitor
-        enable_alt_release_exit = 0 # alt swith mode arg,see readme for detail
-        alt_replace_key = Alt_L # alt swith mode arg,see readme for detail
-        alt_toggle_auto_next = 0 # auto focus next window when toggle overview in alt swith mode
+        auto_exit = 1 # Don't open overview if there are no clients to be opened.
+        auto_fullscreen = 0 # Maximize selected window from overview mode after exit.
+        only_active_workspace = 0 # Only overview windows from the active workspace
+        only_active_monitor = 0 # Only overview windows from the active monitor
+        enable_alt_release_exit = 0 # If `1` overview mode will automatically exit once you release the assigned alt key.
+        alt_replace_key = Alt_L # Change the modifier key for overview mode, options are [ Alt_L, Alt_R, Super_L, Super_R, Control_L, Control_R, Shift_L, Shift_R ] or a key code e.g. code:133
+        alt_toggle_auto_next = 0 # Automatically focus the next client in the overview mode, useful in combination with `enable_alt_release_exit` to quickly toggle between clients.
+
         click_in_cursor = 1 # when click to jump,the target windwo is find by cursor, not the current foucus window.
         hight_of_titlebar = 0 # height deviation of title bar hight
 
@@ -106,7 +115,7 @@ plugin {
 
 ```
 
-# suggested additional configuration
+# Suggested additional configuration
 - when `auto_fullscreen=1` is set, you can also set the border color to mark the maximize state and bind key to control fullscreen maximize state.
 ```
 windowrulev2 = bordercolor rgb(158833),fullscreen:1 # set bordercolor to green if window is fullscreen maximize
@@ -121,7 +130,7 @@ https://github.com/DreamMaoMao/hycov/assets/30348075/15ba36c2-1782-4ae0-8ac1-d0c
 </details>
 
 
-- if you use the `hyprland/workspaces` module in waybar,you should change field {id} to {name}. It will let you know you are in overview mode.
+- If you use the `hyprland/workspaces` module in waybar, you should change field {id} to {name}. That way when you are in overview mode it will display as "OVERVIEW".
 ```
 "hyprland/workspaces": {
     "format": "{name}",
@@ -134,41 +143,6 @@ https://github.com/DreamMaoMao/hycov/assets/30348075/15ba36c2-1782-4ae0-8ac1-d0c
 
 ![image](https://github.com/DreamMaoMao/hycov/assets/30348075/332f4025-20c1-4a44-853b-1b5264df986e)
 ![image](https://github.com/DreamMaoMao/hycov/assets/30348075/500d9fd7-299b-48bc-ab72-146f263044a5)
-
-</details>
-
-
-# Alt switch mode
-```conf
-enable_alt_release_exit = 1
-alt_toggle_auto_next = 0 # auto focus next window when enter overview in alt mode
-# alt_replace_key = Alt_L # If your MainKey of toggleoverview is ALt, you can ignore it
-```
-## operation
-such as `alt + tab`:
-
-- 1.`alt + tab` will enter overview when you not in overview(please hold alt,don't make it release)
-
-- 2.`alt + tab` will switch window focus circularly when you in overview. (please hold alt,don't make it release)
-
-- 3.when you release `alt` , it will auto exit overview.
-
-<details>
-<summary> If you don't want to use `alt` as MainKey in alt mode</summary>
-
-such as use `super` to repalce `alt`
-- 1.bind toggleoverview
-```
-bind = SUPER,tab,hycov:toggleoverview
-```
-- 2.use `alt_replace_key` to specify what is the detection key on release.
-```
-# use keyname
-alt_replace_key = Super_L # Alt_L,Alt_R,Super_L,Super_R,Control_L,Control_R,Shift_L,Shift_R
-
-# use keycode
-alt_replace_key = code:133 # use `xev` command to get keycode
-```
 
 </details>
 
@@ -188,7 +162,7 @@ alt_replace_key = code:133 # use `xev` command to get keycode
 
     hyprland.url = "github:hyprwm/Hyprland";
 
-    hycov={
+    hycov = {
       url = "github:DreamMaoMao/hycov";
       inputs.hyprland.follows = "hyprland";
     };
@@ -212,22 +186,7 @@ alt_replace_key = code:133 # use `xev` command to get keycode
                 hycov.packages.${pkgs.system}.hycov
               ];
               extraConfig = ''
-                bind = ALT,tab,hycov:toggleoverview
-                bind=ALT,left,hycov:movefocus,l
-                bind=ALT,right,hycov:movefocus,r
-                bind=ALT,up,hycov:movefocus,u
-                bind=ALT,down,hycov:movefocus,d
-
-                plugin {
-                    hycov {
-                      overview_gappo = 60 #gaps width from screen
-                      overview_gappi = 24 #gaps width from clients
-                	    hotarea_size = 10 #hotarea size in bottom left,10x10
-                	    enable_hotarea = 1 # enable mouse cursor hotarea
-                    }
-                }
-              '' + ''
-                # your othor config
+                # your options
               '';
             };
           }
@@ -238,9 +197,9 @@ alt_replace_key = code:133 # use `xev` command to get keycode
 }
 ```
 ## Frequently Asked Questions
-- some config not work, or the plugin not work.
+- Configuration options are not working?
 ```
-if you use install hycov at first time,please try logout and relogin again.
+If you just installed hycov for the first time please logout and back in again.
 ```
 
 - The numbers on the waybar are confused
