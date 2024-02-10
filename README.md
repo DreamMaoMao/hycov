@@ -82,7 +82,7 @@ plugin {
     hycov {
         overview_gappo = 60 # gaps width from screen edge
         overview_gappi = 24 # gaps width from clients
-        enable_hotarea = 1 # enable mouse cursor hotarea     
+        enable_hotarea = 1 # enable mouse cursor hotarea, when mouse enter hotarea, it will toggle overview    
         hotarea_monitor = all # monitor name which hotarea is in, default is all
         hotarea_pos = 1 # position of hotarea (1: bottom left, 2: bottom right, 3: top left, 4: top right)
         hotarea_size = 10 # hotarea size, 10x10
