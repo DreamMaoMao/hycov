@@ -368,6 +368,7 @@ void dispatch_enteroverview(std::string arg)
 
 	//enter overview layout
 	// g_pLayoutManager->switchToLayout("ovgrid");
+	hycov_log(LOG,"change to layout:ovgrid");
 	switchToLayoutWithoutReleaseData("ovgrid");
 	g_pLayoutManager->getCurrentLayout()->onEnable();
 	

@@ -10,28 +10,28 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 	PHANDLE = handle;
 
 #define CONF(NAME,VALUE) \
-	HyprlandAPI::addConfigValue(PHANDLE, "plugin:hycov:" NAME, Hyprlang::CConfigValue((VALUE)))
+	HyprlandAPI::addConfigValue(PHANDLE, "plugin:hycov:" NAME, {VALUE})
 
-	CONF("overview_gappo", (int64_t)60);
-	CONF("overview_gappi", (int64_t)24);
-	CONF("hotarea_size", (int64_t)10);
-	CONF("hotarea_monitor", (char *)"all");
-  	CONF("hotarea_pos", (int64_t)1);
-	CONF("enable_hotarea", (int64_t)1);
-	CONF("swipe_fingers",  (int64_t)4);
-	CONF("move_focus_distance",  (int64_t)100);
-	CONF("enable_gesture", (int64_t)0);
-	CONF("disable_workspace_change", (int64_t)0);
-	CONF("disable_spawn", (int64_t)0);
-	CONF("auto_exit",  (int64_t)1);
-	CONF("auto_fullscreen", (int64_t)0);
-	CONF("only_active_workspace", (int64_t)0);
-	CONF("only_active_monitor", (int64_t)0);
-	CONF("enable_alt_release_exit", (int64_t)0);
-	CONF("alt_toggle_auto_next", (int64_t)0);
-	CONF("click_in_cursor", (int64_t)1);
-	CONF("hight_of_titlebar", (int64_t)0);
-	CONF("alt_replace_key", (char *)"Alt_L");
+	CONF("overview_gappo", 60L);
+	CONF("overview_gappi", 24L);
+	CONF("hotarea_size", 10L);
+  	CONF("hotarea_pos", 1L);
+	CONF("enable_hotarea", 1L);
+	CONF("swipe_fingers",  4L);
+	CONF("move_focus_distance",  100L);
+	CONF("enable_gesture", 0L);
+	CONF("disable_workspace_change", 0L);
+	CONF("disable_spawn", 0L);
+	CONF("auto_exit",  1L);
+	CONF("auto_fullscreen", 0L);
+	CONF("only_active_workspace", 0L);
+	CONF("only_active_monitor", 0L);
+	CONF("enable_alt_release_exit", 0L);
+	CONF("alt_toggle_auto_next", 0L);
+	CONF("click_in_cursor", 1L);
+	CONF("hight_of_titlebar", 0L);
+	CONF("hotarea_monitor", "all");
+	CONF("alt_replace_key", "Alt_L");
 
 
 #undef CONF
