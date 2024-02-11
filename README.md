@@ -1,5 +1,5 @@
 # hycov
-A Hyprland overview mode plugin, a new tiling WM workflow.  
+A client overview plugin for Hyprland. 
 
 ### What can it do?
 - Hycov can tile all of your windows in a single workspace via grid layout.
@@ -78,10 +78,10 @@ bind = ALT,g,hycov:toggleoverview,forceallinone
 # The key binding for directional switch mode.
 # Calculate the window closest to the direction to switch focus.
 # This keybind is applicable not only to the overview, but also to the general layout.
-bind=ALT,left,hycov:movefocus,l
-bind=ALT,right,hycov:movefocus,r
-bind=ALT,up,hycov:movefocus,u
-bind=ALT,down,hycov:movefocus,d
+bind = ALT, left, hycov:movefocus, l
+bind = ALT, right, hycov:movefocus, r
+bind = ALT, up, hycov:movefocus, u
+bind = ALT, down, hycov:movefocus, d
 
 plugin {
     hycov {
