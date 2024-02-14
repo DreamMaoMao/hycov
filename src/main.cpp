@@ -36,32 +36,35 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 
 #undef CONF
 
+	HyprlandAPI::reloadConfig();
+	g_pConfigManager->tick();
+
 	// int value
-	static const auto *pEnable_hotarea_config = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:enable_hotarea");
-  	static const auto *pHotarea_pos_config = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:hotarea_pos");
-  	static const auto *pHotarea_size_config = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:hotarea_size");
-	static const auto *pSwipe_fingers_config = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:swipe_fingers");
-	static const auto *pMove_focus_distance_config = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:move_focus_distance");
-	static const auto *pEnable_gesture_config = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:enable_gesture");
-	static const auto *pDisable_workspace_change_config = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:disable_workspace_change");
-	static const auto *pDisable_spawn_config = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:disable_spawn");
-	static const auto *pAuto_exit_config = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:auto_exit");
-	static const auto *pAuto_fullscreen = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:auto_fullscreen");
-	static const auto *pOnly_active_workspace = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:only_active_workspace");
-	static const auto *pOnly_active_monitor = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:only_active_monitor");
-	static const auto *pEnable_alt_release_exit = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:enable_alt_release_exit");
-	static const auto *pAlt_toggle_auto_next = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:alt_toggle_auto_next");
-	static const auto *pClick_in_cursor = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:click_in_cursor");
-	static const auto *pHight_of_titlebar = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:hight_of_titlebar");
-    static const auto *pBordersize = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "general:border_size");
-    static const auto *pOverview_gappo = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:overview_gappo");
-    static const auto *pOverview_gappi = (Hyprlang::INT* const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:overview_gappi");
+	static const auto *pEnable_hotarea_config = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:enable_hotarea")->getDataStaticPtr());
+  	static const auto *pHotarea_pos_config = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:hotarea_pos")->getDataStaticPtr());
+  	static const auto *pHotarea_size_config = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:hotarea_size")->getDataStaticPtr());
+	static const auto *pSwipe_fingers_config = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:swipe_fingers")->getDataStaticPtr());
+	static const auto *pMove_focus_distance_config = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:move_focus_distance")->getDataStaticPtr());
+	static const auto *pEnable_gesture_config = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:enable_gesture")->getDataStaticPtr());
+	static const auto *pDisable_workspace_change_config = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:disable_workspace_change")->getDataStaticPtr());
+	static const auto *pDisable_spawn_config = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:disable_spawn")->getDataStaticPtr());
+	static const auto *pAuto_exit_config = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:auto_exit")->getDataStaticPtr());
+	static const auto *pAuto_fullscreen = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:auto_fullscreen")->getDataStaticPtr());
+	static const auto *pOnly_active_workspace = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:only_active_workspace")->getDataStaticPtr());
+	static const auto *pOnly_active_monitor = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:only_active_monitor")->getDataStaticPtr());
+	static const auto *pEnable_alt_release_exit = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:enable_alt_release_exit")->getDataStaticPtr());
+	static const auto *pAlt_toggle_auto_next = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:alt_toggle_auto_next")->getDataStaticPtr());
+	static const auto *pClick_in_cursor = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:click_in_cursor")->getDataStaticPtr());
+	static const auto *pHight_of_titlebar = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:hight_of_titlebar")->getDataStaticPtr());
+    static const auto *pBordersize = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "general:border_size")->getDataStaticPtr());
+    static const auto *pOverview_gappo = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:overview_gappo")->getDataStaticPtr());
+    static const auto *pOverview_gappi = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:overview_gappi")->getDataStaticPtr());
 
 
 	// string value
-	static const auto *pAlt_replace_key = (Hyprlang::STRING const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:alt_replace_key");
-  	static const auto *pHotarea_monitor_config = (Hyprlang::STRING const*)HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:hotarea_monitor");
-	static const auto *pConfigLayoutName = (Hyprlang::STRING const*)HyprlandAPI::getConfigValue(PHANDLE, "general:layout");
+	static const auto *pAlt_replace_key = (Hyprlang::STRING const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:alt_replace_key")->getDataStaticPtr());
+  	static const auto *pHotarea_monitor_config = (Hyprlang::STRING const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:hotarea_monitor")->getDataStaticPtr());
+	static const auto *pConfigLayoutName = (Hyprlang::STRING const*)(HyprlandAPI::getConfigValue(PHANDLE, "general:layout")->getDataStaticPtr());
 
 
 	// int value
