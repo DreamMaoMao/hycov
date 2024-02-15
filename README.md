@@ -99,7 +99,7 @@ plugin {
         alt_replace_key = Alt_L # alt swith mode arg,see readme for detail
         alt_toggle_auto_next = 0 # auto focus next window when toggle overview in alt swith mode
         click_in_cursor = 1 # when click to jump,the target windwo is find by cursor, not the current foucus window.
-        hight_of_titlebar = 0 # height deviation of title bar hight
+        hight_of_titlebar = 0 # height deviation of title bar height
 
     }
 }
