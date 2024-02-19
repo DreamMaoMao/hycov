@@ -206,6 +206,7 @@ alt_replace_key = code:133 # use `xev` command to get keycode
           {
             wayland.windowManager.hyprland = {
               enable = true;
+              package = hyprland.packages."${pkgs.system}".hyprland;
               plugins = [
                 hycov.packages.${pkgs.system}.hycov
               ];
