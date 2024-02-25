@@ -78,6 +78,12 @@ bind=ALT,right,hycov:movefocus,r
 bind=ALT,up,hycov:movefocus,u
 bind=ALT,down,hycov:movefocus,d
 
+# if you want to focus move can cross monitor, use this
+bind=ALT,left,hycov:movefocus,leftcross
+bind=ALT,right,hycov:movefocus,rightcross
+bind=ALT,up,hycov:movefocus,upcross
+bind=ALT,down,hycov:movefocus,downcross
+
 plugin {
     hycov {
         overview_gappo = 60 # gaps width from screen edge

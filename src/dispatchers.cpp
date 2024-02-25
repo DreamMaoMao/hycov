@@ -57,15 +57,27 @@ bool want_auto_fullscren(CWindow *pWindow) {
 	}
 }
 
-bool isDirection(const std::string& arg) {
-    return arg == "l" || arg == "r" || arg == "u" || arg == "d" || arg == "left" || arg == "right" || arg == "up" || arg == "down";
+bool isDirectionArg(std::string arg) {
+	if (arg == "l" || arg == "r" || arg == "u" || arg == "d" || arg == "left" || arg == "right" || arg == "up" || arg == "down"  || arg == "leftcross" || arg == "rightcross" || arg == "upcross" || arg == "downcross") {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool isCrossMonitor(std::string arg) {
+	if (arg == "leftcross" || arg == "rightcross" || arg == "upcross" || arg == "downcross") {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 std::optional<ShiftDirection> parseShiftArg(std::string arg) {
-	if (arg == "l" || arg == "left") return ShiftDirection::Left;
-	else if (arg == "r" || arg == "right") return ShiftDirection::Right;
-	else if (arg == "u" || arg == "up") return ShiftDirection::Up;
-	else if (arg == "d" || arg == "down") return ShiftDirection::Down;
+	if (arg == "l" || arg == "left" || arg == "leftcross") return ShiftDirection::Left;
+	else if (arg == "r" || arg == "right" || arg == "rightcross") return ShiftDirection::Right;
+	else if (arg == "u" || arg == "up" || arg == "upcross") return ShiftDirection::Up;
+	else if (arg == "d" || arg == "down" || arg == "downcross") return ShiftDirection::Down;
 	else return {};
 }
 
@@ -83,8 +95,8 @@ CWindow *direction_select(std::string arg){
 		return nullptr;
 	}
 
-    if (!isDirection(arg)) {
-        hycov_log(ERR, "Cannot move focus in direction {}, unsupported direction. Supported: l/left,r/right,u/up,d/down", arg);
+    if (!isDirectionArg(arg)) {
+        hycov_log(ERR, "Cannot move focus in direction {}, unsupported direction. Supported: l/left/leftcross,r/right/rightcross,u/up/upcross,d/down/downcross", arg);
 		delete[] pTempCWindows;
         return nullptr;
     }
@@ -92,10 +104,19 @@ CWindow *direction_select(std::string arg){
     for (auto &w : g_pCompositor->m_vWindows)
     {
 		CWindow *pWindow = w.get();
-        if (pTempClient == pWindow || pTempClient->m_iWorkspaceID !=pWindow->m_iWorkspaceID || pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut || pWindow->m_bIsFullscreen)
-            continue;
-			last++;
-			pTempCWindows[last] = pWindow;			
+
+        if (pTempClient == pWindow || pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut || pWindow->m_bIsFullscreen) {
+			continue;
+		}
+        
+		auto *pMonitor = g_pCompositor->getMonitorFromID(pWindow->m_iMonitorID);
+
+		if (!((isCrossMonitor(arg) && pWindow->m_iWorkspaceID == pMonitor->activeWorkspace ) || pTempClient->m_iWorkspaceID == pWindow->m_iWorkspaceID)) {
+			continue;
+		}
+			
+		last++;
+		pTempCWindows[last] = pWindow;			
     }
 	
   	if (last < 0) {
