@@ -19,10 +19,10 @@ Anyone is welcome to fork. If you end up improving the plugin, please let me kno
 
 ### Manual Installation
 
-##### NOTE:
-1. After Hycov is installed, you will need to logout, then log back in. This may happen automatically, but do not worry. This behaviour is normal.
-
-2. Only supports hyprland source code after 2023-10-22, because the plugin requires this [commit](https://github.com/hyprwm/Hyprland/commit/a61eb7694df25a75f45502ed64b1536fda370c1d) in [hyprland](https://github.com/hyprwm/Hyprland).
+> [!NOTE]
+> 1. After Hycov is installed, you will need to logout, then log back in. This may happen automatically, but do not worry. This behaviour is normal.
+> 2. Only supports hyprland source code after 2023-10-22, because the plugin requires this [commit](https://github.com/hyprwm/Hyprland/commit/a61eb7694df25a75f45502ed64b1536fda370c1d) in [hyprland](https://github.com/hyprwm/Hyprland).
+> 3. Each release of hycov corresponds to each release of hyprland. If you are using a release version of hyprland, but you are using the latest hycov-git, this may not be available. Therefore, hyprland-git is recommended to use hycov-git and hyprland-release is recommended to use the corresponding hycov-release.
 
 ##### Using meson and ninja:
 
@@ -78,7 +78,7 @@ bind=ALT,right,hycov:movefocus,r
 bind=ALT,up,hycov:movefocus,u
 bind=ALT,down,hycov:movefocus,d
 
-# if you want to focus move can cross monitor, use this
+# if you want that focusmove can cross monitor, use this
 bind=ALT,left,hycov:movefocus,leftcross
 bind=ALT,right,hycov:movefocus,rightcross
 bind=ALT,up,hycov:movefocus,upcross
@@ -259,10 +259,27 @@ this issue has been fixed in the waybar project, fix date (2023-10-27)
 
 - Compilation failure
 ```
-Please pull the latest hyprland source code to compile and install. The plugin relies on a hyprland pr,pr submission date (2023-10-21)
+Please pull the latest hyprland source code to compile and install.
+The plugin relies on a hyprland pr,pr submission date (2023-10-21)
 ```
 
 - Unable to load
 ```
-Check whether hyprland has been updated, and if so, please recompile hyprcov
+Check whether hyprland has been updated,
+and if so, please recompile hyprcov
+```
+
+- build fail with message `No such file or directory #include <wlr/xxx>`
+```
+#step1
+yay -R hyprland-git wlroots-git
+
+#step2
+sudo rm -rf /usr/include/hyprland
+sudo rm -rf /usr/include/wlr
+sudo rm -rf/usr/local/include/hyprland
+sudo rm -rf /usr/local/include/wlr
+
+#step3
+yay -S  wlroots-git hyprland-git
 ```
