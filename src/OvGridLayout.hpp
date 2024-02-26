@@ -22,6 +22,7 @@ struct SOvGridNodeData
   bool ovbk_windowIsWithRounding;
   bool ovbk_windowIsWithShadow;
   bool isInOldLayout = false;
+  bool isGroupActive = false;
 
   int workspaceID = -1;
 

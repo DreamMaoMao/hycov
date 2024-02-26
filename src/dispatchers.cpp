@@ -503,13 +503,18 @@ void dispatch_leaveoverview(std::string arg)
 			n.pWindow->m_vRealPosition = calcPos;
 
 			// some app sometime can't catch window size to restore,don't use dirty data,remove refer data in old layout.
-			if (n.ovbk_size.x == 0 && n.ovbk_size.y == 0 && n.isInOldLayout) {
+			if (n.ovbk_size.x == 0 && n.ovbk_size.y == 0 && n.isInOldLayout && !n.pWindow->m_sGroupData.pNextWindow) {
 				g_hycov_OvGridLayout->removeOldLayoutData(n.pWindow);
 				n.isInOldLayout = false;
 			} else {
 				g_pXWaylandManager->setWindowSize(n.pWindow, calcSize);	
 			}
-					
+
+			// restore active window in group
+			if(n.pWindow->m_sGroupData.pNextWindow && n.isGroupActive) {
+				n.pWindow->setGroupCurrent(n.pWindow);
+			}	
+
 		}
 	}
 
@@ -556,7 +561,7 @@ void dispatch_leaveoverview(std::string arg)
 	for (auto &n : g_hycov_OvGridLayout->m_lOvGridNodesData)
 	{
 		// if client not in old layout,create tiling of the client
-		if(!n.isInOldLayout)
+		if(!n.isInOldLayout && !n.pWindow->m_sGroupData.pNextWindow)
 		{
 			if (n.pWindow->m_bFadingOut || !n.pWindow->m_bIsMapped || n.pWindow->isHidden()) {
 				continue;

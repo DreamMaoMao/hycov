@@ -70,12 +70,16 @@ void OvGridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
       pTargetMonitor =  g_pCompositor->getMonitorFromID(pWindow->m_iMonitorID); 
     }
 
+
     const auto pNode = &m_lOvGridNodesData.emplace_back(); // make a new node in list back
 
     const auto pActiveWorkspace = g_pCompositor->getWorkspaceByID(pTargetMonitor->activeWorkspace); 
 
     const auto pWindowOriWorkspace = g_pCompositor->getWorkspaceByID(pWindow->m_iWorkspaceID);
 
+    if(pWindow->m_sGroupData.pNextWindow && pWindow->getGroupCurrent() == pWindow) {
+        pNode->isGroupActive = true;
+	}
 
     auto oldLayoutRecordNode = getOldLayoutRecordNodeFromWindow(pWindow);
     if(oldLayoutRecordNode) {
