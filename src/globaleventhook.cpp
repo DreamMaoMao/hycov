@@ -288,7 +288,41 @@ void hkSDwindleNodeData_recalcSizePosRecursive(void* thisptr,bool force, bool ho
   ;
 }
 
+void hkCKeybindManager_changeGroupActive(std::string args) {
+    const auto PWINDOW = g_pCompositor->m_pLastWindow;
+    CWindow *pTargetWindow;
+    if (!PWINDOW)
+        return;
 
+    if (!PWINDOW->m_sGroupData.pNextWindow)
+        return;
+
+    if (PWINDOW->m_sGroupData.pNextWindow == PWINDOW)
+        return;
+
+    auto pNode =  g_hycov_OvGridLayout->getNodeFromWindow(PWINDOW);
+    if (!pNode)
+      return;
+
+    if (args != "b" && args != "prev") {
+        pTargetWindow = pNode->pGroupNextWindow;
+    } else {
+        pTargetWindow = pNode->pGroupPrevWindow;
+    }  
+
+    if(pNode->isInOldLayout) { // if client is taken from the old layout
+        g_hycov_OvGridLayout->removeOldLayoutData(PWINDOW);
+        pNode->isInOldLayout = false;
+    }
+
+    pNode->pWindow = pTargetWindow;
+    pNode->pGroupPrevWindow = pTargetWindow->getGroupPrevious();
+    pNode->pGroupNextWindow = pTargetWindow->m_sGroupData.pNextWindow;
+    pNode->pWindow->m_iWorkspaceID = pNode->workspaceID;
+
+    PWINDOW->setGroupCurrent(pTargetWindow);
+    g_hycov_OvGridLayout->applyNodeDataToWindow(pNode);
+}
 
 void registerGlobalEventHook()
 {
@@ -331,6 +365,9 @@ void registerGlobalEventHook()
   //mousebutton
   g_hycov_pCInputManager_onMouseButton = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::onMouseButton, (void*)&hkCInputManager_onMouseButton);
   g_hycov_pCInputManager_onMouseButton->hook();
+
+  //changeGroupActive
+  g_hycov_pCKeybindManager_changeGroupActive = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CKeybindManager::changeGroupActive, (void*)&hkCKeybindManager_changeGroupActive);
 
   //create private function hook
 

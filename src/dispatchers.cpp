@@ -418,6 +418,8 @@ void dispatch_enteroverview(std::string arg)
 		g_hycov_pSpawnHook->hook();
 	}
 
+	g_hycov_pCKeybindManager_changeGroupActive->hook();
+
 	return;
 }
 
@@ -449,6 +451,8 @@ void dispatch_leaveoverview(std::string arg)
 	if(g_hycov_disable_spawn) {
 		g_hycov_pSpawnHook->unhook();
 	}
+
+	g_hycov_pCKeybindManager_changeGroupActive->unhook();
 
 	// if no clients, just exit overview, don't restore client's state
 	if (g_hycov_OvGridLayout->m_lOvGridNodesData.empty())
@@ -503,7 +507,7 @@ void dispatch_leaveoverview(std::string arg)
 			n.pWindow->m_vRealPosition = calcPos;
 
 			// some app sometime can't catch window size to restore,don't use dirty data,remove refer data in old layout.
-			if (n.ovbk_size.x == 0 && n.ovbk_size.y == 0 && n.isInOldLayout && !n.pWindow->m_sGroupData.pNextWindow) {
+			if (n.ovbk_size.x == 0 && n.ovbk_size.y == 0 && n.isInOldLayout) {
 				g_hycov_OvGridLayout->removeOldLayoutData(n.pWindow);
 				n.isInOldLayout = false;
 			} else {
@@ -511,7 +515,7 @@ void dispatch_leaveoverview(std::string arg)
 			}
 
 			// restore active window in group
-			if(n.pWindow->m_sGroupData.pNextWindow && n.isGroupActive) {
+			if(n.isGroupActive) {
 				n.pWindow->setGroupCurrent(n.pWindow);
 			}	
 
@@ -561,7 +565,7 @@ void dispatch_leaveoverview(std::string arg)
 	for (auto &n : g_hycov_OvGridLayout->m_lOvGridNodesData)
 	{
 		// if client not in old layout,create tiling of the client
-		if(!n.isInOldLayout && !n.pWindow->m_sGroupData.pNextWindow)
+		if(!n.isInOldLayout)
 		{
 			if (n.pWindow->m_bFadingOut || !n.pWindow->m_bIsMapped || n.pWindow->isHidden()) {
 				continue;
@@ -569,7 +573,11 @@ void dispatch_leaveoverview(std::string arg)
 			hycov_log(LOG,"create tiling window in old layout,window:{},workspace:{},inoldlayout:{}",n.pWindow,n.workspaceID,n.isInOldLayout);
 			g_pLayoutManager->getCurrentLayout()->onWindowCreatedTiling(n.pWindow);
 		}
-
+		
+		// restore active window in group
+		if(n.isGroupActive) {
+			n.pWindow->setGroupCurrent(n.pWindow);
+		}	
 	}
 
 	//clean overview layout node date

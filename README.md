@@ -1,6 +1,11 @@
 # hycov
 A Hyprland overview mode plugin, a new tiling WM workflow.  
 
+> [!NOTE]
+> Sorry guys, because I've been using my own Hyprland branch and the features have been sufficient for me,
+> this plugin change started to not work for my Hyprland branch, so I decided to stop it.
+> Please fork freely.
+
 ### What can it do?
 - Hycov can tile all of your windows in a single workspace via grid layout.
 

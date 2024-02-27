@@ -77,15 +77,19 @@ void OvGridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
 
     const auto pWindowOriWorkspace = g_pCompositor->getWorkspaceByID(pWindow->m_iWorkspaceID);
 
-    if(pWindow->m_sGroupData.pNextWindow && pWindow->getGroupCurrent() == pWindow) {
-        pNode->isGroupActive = true;
-	}
-
     auto oldLayoutRecordNode = getOldLayoutRecordNodeFromWindow(pWindow);
     if(oldLayoutRecordNode) {
         pNode->isInOldLayout = true; //client is taken from the old layout
         m_lSOldLayoutRecordNodeData.remove(*oldLayoutRecordNode);
     }
+
+    //record the previcous window in group
+    if(pWindow->m_sGroupData.pNextWindow && pWindow->getGroupCurrent() == pWindow) {
+        pNode->isGroupActive = true;
+        pNode->pGroupPrevWindow = pWindow->getGroupPrevious();
+        pNode->pGroupNextWindow = pWindow->m_sGroupData.pNextWindow;
+	}
+
 
     pNode->workspaceID = pWindow->m_iWorkspaceID; // encapsulate window objects as node objects to bind more properties
     pNode->pWindow = pWindow;
@@ -173,6 +177,18 @@ void OvGridLayout::onWindowRemovedTiling(CWindow *pWindow)
 
     if(pNode->isInOldLayout) { // if client is taken from the old layout
         removeOldLayoutData(pWindow);
+    }
+
+    // if window is in a group,replace it with other window in same group
+    if(pNode->isGroupActive && pNode->pGroupPrevWindow && pNode->pGroupPrevWindow != pNode->pWindow) {
+        pNode->pWindow = pNode->pGroupPrevWindow;
+        pNode->pGroupPrevWindow = pNode->pGroupPrevWindow->getGroupPrevious();
+        pNode->pGroupNextWindow = pNode->pGroupPrevWindow->m_sGroupData.pNextWindow;
+        pNode->pWindow->m_iWorkspaceID = pNode->workspaceID;
+        applyNodeDataToWindow(pNode);
+        pNode->isInOldLayout = false;
+        g_pCompositor->focusWindow(pNode->pWindow);
+        return;
     }
 
     m_lOvGridNodesData.remove(*pNode);

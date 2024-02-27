@@ -61,6 +61,8 @@ inline CFunctionHook* g_hycov_pHyprMasterLayout_recalculateMonitor = nullptr;
 inline CFunctionHook* g_hycov_pHyprDwindleLayout_recalculateWindow = nullptr;
 inline CFunctionHook* g_hycov_pSDwindleNodeData_recalcSizePosRecursive = nullptr;
 inline CFunctionHook* g_hycov_pCInputManager_onMouseButton = nullptr;
+inline CFunctionHook* g_hycov_pCKeybindManager_changeGroupActive = nullptr;
+
 
 inline void errorNotif()
 {
