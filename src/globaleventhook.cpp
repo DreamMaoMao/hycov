@@ -172,7 +172,7 @@ static void hkCInputManager_onMouseButton(void* thisptr, wlr_pointer_button_even
       break;
     }  
   } else {
-    (*(origCInputManager_onMouseButton)g_hycov_pCInputManager_onMouseButton->m_pOriginal)(thisptr, e);
+    (*(origCInputManager_onMouseButton)g_hycov_pCInputManager_onMouseButtonHook->m_pOriginal)(thisptr, e);
   }
 }
 
@@ -288,6 +288,14 @@ void hkSDwindleNodeData_recalcSizePosRecursive(void* thisptr,bool force, bool ho
   ;
 }
 
+void hkCKeybindManager_toggleGroup(std::string args) {
+  ;
+}
+
+void hkCKeybindManager_moveOutOfGroup(std::string args) {
+  ;
+}
+
 void hkCKeybindManager_changeGroupActive(std::string args) {
     const auto PWINDOW = g_pCompositor->m_pLastWindow;
     CWindow *pTargetWindow;
@@ -310,6 +318,8 @@ void hkCKeybindManager_changeGroupActive(std::string args) {
         pTargetWindow = pNode->pGroupPrevWindow;
     }  
 
+    hycov_log(LOG,"changeGroupActive,pTargetWindow:{}",pTargetWindow);
+
     if(pNode->isInOldLayout) { // if client is taken from the old layout
         g_hycov_OvGridLayout->removeOldLayoutData(PWINDOW);
         pNode->isInOldLayout = false;
@@ -319,10 +329,11 @@ void hkCKeybindManager_changeGroupActive(std::string args) {
     pNode->pGroupPrevWindow = pTargetWindow->getGroupPrevious();
     pNode->pGroupNextWindow = pTargetWindow->m_sGroupData.pNextWindow;
     pNode->pWindow->m_iWorkspaceID = pNode->workspaceID;
-
+    
     PWINDOW->setGroupCurrent(pTargetWindow);
     g_hycov_OvGridLayout->applyNodeDataToWindow(pNode);
 }
+
 
 void registerGlobalEventHook()
 {
@@ -356,18 +367,23 @@ void registerGlobalEventHook()
   g_hycov_pOnKeyboardKeyHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::onKeyboardKey, (void*)&hkOnKeyboardKey);
 
   // layotu reculate
-  g_hycov_pHyprDwindleLayout_recalculateMonitor = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CHyprDwindleLayout::recalculateMonitor, (void*)&hkHyprDwindleLayout_recalculateMonitor);
-  g_hycov_pHyprMasterLayout_recalculateMonitor = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CHyprMasterLayout::recalculateMonitor, (void*)&hkHyprMasterLayout_recalculateMonitor);
-  g_hycov_pHyprDwindleLayout_recalculateWindow = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CHyprDwindleLayout::recalculateWindow, (void*)&hkHyprDwindleLayout_recalculateWindow);
-  g_hycov_pSDwindleNodeData_recalcSizePosRecursive = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&SDwindleNodeData::recalcSizePosRecursive, (void*)&hkSDwindleNodeData_recalcSizePosRecursive);
+  g_hycov_pHyprDwindleLayout_recalculateMonitorHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CHyprDwindleLayout::recalculateMonitor, (void*)&hkHyprDwindleLayout_recalculateMonitor);
+  g_hycov_pHyprMasterLayout_recalculateMonitorHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CHyprMasterLayout::recalculateMonitor, (void*)&hkHyprMasterLayout_recalculateMonitor);
+  g_hycov_pHyprDwindleLayout_recalculateWindowHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CHyprDwindleLayout::recalculateWindow, (void*)&hkHyprDwindleLayout_recalculateWindow);
+  g_hycov_pSDwindleNodeData_recalcSizePosRecursiveHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&SDwindleNodeData::recalcSizePosRecursive, (void*)&hkSDwindleNodeData_recalcSizePosRecursive);
 
 
-  //mousebutton
-  g_hycov_pCInputManager_onMouseButton = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::onMouseButton, (void*)&hkCInputManager_onMouseButton);
-  g_hycov_pCInputManager_onMouseButton->hook();
+  //mousebutto
+  g_hycov_pCInputManager_onMouseButtonHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::onMouseButton, (void*)&hkCInputManager_onMouseButton);
+
 
   //changeGroupActive
-  g_hycov_pCKeybindManager_changeGroupActive = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CKeybindManager::changeGroupActive, (void*)&hkCKeybindManager_changeGroupActive);
+  g_hycov_pCKeybindManager_changeGroupActiveHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CKeybindManager::changeGroupActive, (void*)&hkCKeybindManager_changeGroupActive);
+
+  //toggleGroup
+  g_hycov_pCKeybindManager_toggleGroupHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CKeybindManager::toggleGroup, (void*)&hkCKeybindManager_toggleGroup);
+  //moveOutOfGroup
+  g_hycov_pCKeybindManager_moveOutOfGroupHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CKeybindManager::moveOutOfGroup, (void*)&hkCKeybindManager_moveOutOfGroup);
 
   //create private function hook
 
@@ -389,6 +405,7 @@ void registerGlobalEventHook()
 
   //register pEvent hook
   if(g_hycov_enable_hotarea){
+    g_hycov_pCInputManager_onMouseButtonHook->hook();
     HyprlandAPI::registerCallbackDynamic(PHANDLE, "mouseMove",[&](void* self, SCallbackInfo& info, std::any data) { mouseMoveHook(self, info, data); });
   }
 

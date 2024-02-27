@@ -25,7 +25,7 @@ struct SOvGridNodeData
   bool isGroupActive = false;
   CWindow* pGroupPrevWindow = nullptr;
   CWindow* pGroupNextWindow = nullptr;
-  
+
   int workspaceID = -1;
 
   bool operator==(const SOvGridNodeData &rhs) const

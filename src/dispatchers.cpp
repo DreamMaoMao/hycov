@@ -111,7 +111,7 @@ CWindow *direction_select(std::string arg){
         
 		auto *pMonitor = g_pCompositor->getMonitorFromID(pWindow->m_iMonitorID);
 
-		if (!((isCrossMonitor(arg) && pWindow->m_iWorkspaceID == pMonitor->activeWorkspace ) || pTempClient->m_iWorkspaceID == pWindow->m_iWorkspaceID)) {
+		if (!((isCrossMonitor(arg) && pWindow->m_iMonitorID != pTempClient->m_iMonitorID && !g_pCompositor->isWorkspaceSpecial(pTempClient->m_iWorkspaceID) && pWindow->m_iWorkspaceID == pMonitor->activeWorkspace ) || pTempClient->m_iWorkspaceID == pWindow->m_iWorkspaceID)) {
 			continue;
 		}
 			
@@ -378,6 +378,11 @@ void dispatch_enteroverview(std::string arg)
 		}
 	}
 
+	//enter overview layout
+	// g_pLayoutManager->switchToLayout("ovgrid");
+	switchToLayoutWithoutReleaseData("ovgrid");
+	g_pLayoutManager->getCurrentLayout()->onEnable();
+	
 
 	//change workspace name to OVERVIEW
 	pActiveMonitor	= g_pCompositor->m_pLastMonitor;
@@ -386,13 +391,6 @@ void dispatch_enteroverview(std::string arg)
 	workspaceIdBackup = pActiveWorkspace->m_iID;
 	g_pCompositor->renameWorkspace(pActiveMonitor->activeWorkspace,overviewWorksapceName);
 
-
-	//enter overview layout
-	// g_pLayoutManager->switchToLayout("ovgrid");
-	hycov_log(LOG,"change to layout:ovgrid");
-	switchToLayoutWithoutReleaseData("ovgrid");
-	g_pLayoutManager->getCurrentLayout()->onEnable();
-	
 	//Preserve window focus
 	if(pActiveWindow){
 		g_pCompositor->focusWindow(pActiveWindow); //restore the focus to before active window
@@ -418,7 +416,9 @@ void dispatch_enteroverview(std::string arg)
 		g_hycov_pSpawnHook->hook();
 	}
 
-	g_hycov_pCKeybindManager_changeGroupActive->hook();
+	g_hycov_pCKeybindManager_changeGroupActiveHook->hook();
+	g_hycov_pCKeybindManager_toggleGroupHook->hook();
+	g_hycov_pCKeybindManager_moveOutOfGroupHook->hook();
 
 	return;
 }
@@ -432,6 +432,9 @@ void dispatch_leaveoverview(std::string arg)
 	const auto pMonitor = g_pCompositor->m_pLastMonitor;
 	if(pMonitor->specialWorkspaceID != 0)
 		pMonitor->setSpecialWorkspace(nullptr);
+	
+	// get default layout
+	std::string *configLayoutName = &g_hycov_configLayoutName;
 	
 	hycov_log(LOG,"leave overview");
 	g_hycov_isOverView = false;
@@ -452,12 +455,14 @@ void dispatch_leaveoverview(std::string arg)
 		g_hycov_pSpawnHook->unhook();
 	}
 
-	g_hycov_pCKeybindManager_changeGroupActive->unhook();
+	g_hycov_pCKeybindManager_changeGroupActiveHook->unhook();
+	g_hycov_pCKeybindManager_toggleGroupHook->unhook();
+	g_hycov_pCKeybindManager_moveOutOfGroupHook->unhook();
 
 	// if no clients, just exit overview, don't restore client's state
 	if (g_hycov_OvGridLayout->m_lOvGridNodesData.empty())
 	{
-		switchToLayoutWithoutReleaseData(g_hycov_configLayoutName);
+		switchToLayoutWithoutReleaseData(*configLayoutName);
 		recalculateAllMonitor();
 		g_hycov_OvGridLayout->m_lOvGridNodesData.clear();
 		g_hycov_isOverViewExiting = false;
@@ -512,22 +517,21 @@ void dispatch_leaveoverview(std::string arg)
 				n.isInOldLayout = false;
 			} else {
 				g_pXWaylandManager->setWindowSize(n.pWindow, calcSize);	
-			}
+			}	
 
 			// restore active window in group
 			if(n.isGroupActive) {
 				n.pWindow->setGroupCurrent(n.pWindow);
 			}	
-
 		}
 	}
 
 	//exit overview layout,go back to old layout
 	CWindow *pActiveWindow = g_pCompositor->m_pLastWindow;
 	g_pCompositor->focusWindow(nullptr);
-	// g_pLayoutManager->switchToLayout(g_hycov_configLayoutName);
+	// g_pLayoutManager->switchToLayout(*configLayoutName);
 	// g_pLayoutManager->getCurrentLayout()->onDisable();
-	switchToLayoutWithoutReleaseData(g_hycov_configLayoutName);
+	switchToLayoutWithoutReleaseData(*configLayoutName);
 	recalculateAllMonitor();
 
 	//Preserve window focus
@@ -573,7 +577,6 @@ void dispatch_leaveoverview(std::string arg)
 			hycov_log(LOG,"create tiling window in old layout,window:{},workspace:{},inoldlayout:{}",n.pWindow,n.workspaceID,n.isInOldLayout);
 			g_pLayoutManager->getCurrentLayout()->onWindowCreatedTiling(n.pWindow);
 		}
-		
 		// restore active window in group
 		if(n.isGroupActive) {
 			n.pWindow->setGroupCurrent(n.pWindow);

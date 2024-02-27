@@ -70,7 +70,6 @@ void OvGridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
       pTargetMonitor =  g_pCompositor->getMonitorFromID(pWindow->m_iMonitorID); 
     }
 
-
     const auto pNode = &m_lOvGridNodesData.emplace_back(); // make a new node in list back
 
     const auto pActiveWorkspace = g_pCompositor->getWorkspaceByID(pTargetMonitor->activeWorkspace); 
@@ -89,7 +88,6 @@ void OvGridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
         pNode->pGroupPrevWindow = pWindow->getGroupPrevious();
         pNode->pGroupNextWindow = pWindow->m_sGroupData.pNextWindow;
 	}
-
 
     pNode->workspaceID = pWindow->m_iWorkspaceID; // encapsulate window objects as node objects to bind more properties
     pNode->pWindow = pWindow;
@@ -136,30 +134,31 @@ void OvGridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
 
 void OvGridLayout::removeOldLayoutData(CWindow *pWindow) { 
 
-    switchToLayoutWithoutReleaseData(g_hycov_configLayoutName);
-    hycov_log(LOG,"remove data of old layout:{}",g_hycov_configLayoutName);
+	std::string *configLayoutName = &g_hycov_configLayoutName;
+    switchToLayoutWithoutReleaseData(*configLayoutName);
+    hycov_log(LOG,"remove data of old layout:{}",*configLayoutName);
 
-    if(g_hycov_configLayoutName == "dwindle") {
+    if(*configLayoutName == "dwindle") {
         // disable render client of old layout
-        g_hycov_pHyprDwindleLayout_recalculateMonitor->hook();
-        g_hycov_pHyprDwindleLayout_recalculateWindow->hook();
-        g_hycov_pSDwindleNodeData_recalcSizePosRecursive->hook();
+        g_hycov_pHyprDwindleLayout_recalculateMonitorHook->hook();
+        g_hycov_pHyprDwindleLayout_recalculateWindowHook->hook();
+        g_hycov_pSDwindleNodeData_recalcSizePosRecursiveHook->hook();
 
         // only remove data,not render anything,becaust still in overview
         g_pLayoutManager->getCurrentLayout()->onWindowRemovedTiling(pWindow);
 
-        g_hycov_pSDwindleNodeData_recalcSizePosRecursive->unhook();
-        g_hycov_pHyprDwindleLayout_recalculateWindow->unhook();
-        g_hycov_pHyprDwindleLayout_recalculateMonitor->unhook();
-    } else if(g_hycov_configLayoutName == "master") {
-        g_hycov_pHyprMasterLayout_recalculateMonitor->hook();
+        g_hycov_pSDwindleNodeData_recalcSizePosRecursiveHook->unhook();
+        g_hycov_pHyprDwindleLayout_recalculateWindowHook->unhook();
+        g_hycov_pHyprDwindleLayout_recalculateMonitorHook->unhook();
+    } else if(*configLayoutName == "master") {
+        g_hycov_pHyprMasterLayout_recalculateMonitorHook->hook();
 
         g_pLayoutManager->getCurrentLayout()->onWindowRemovedTiling(pWindow);
 
-        g_hycov_pHyprMasterLayout_recalculateMonitor->unhook();
+        g_hycov_pHyprMasterLayout_recalculateMonitorHook->unhook();
     } else {
         // may be not support other layout
-        hycov_log(ERR,"unknow old layout:{}",g_hycov_configLayoutName);
+        hycov_log(ERR,"unknow old layout:{}",*configLayoutName);
         g_pLayoutManager->getCurrentLayout()->onWindowRemovedTiling(pWindow);
     }
 
@@ -183,7 +182,6 @@ void OvGridLayout::onWindowRemovedTiling(CWindow *pWindow)
     if(pNode->isGroupActive && pNode->pGroupPrevWindow && pNode->pGroupPrevWindow != pNode->pWindow) {
         pNode->pWindow = pNode->pGroupPrevWindow;
         pNode->pGroupPrevWindow = pNode->pGroupPrevWindow->getGroupPrevious();
-        pNode->pGroupNextWindow = pNode->pGroupPrevWindow->m_sGroupData.pNextWindow;
         pNode->pWindow->m_iWorkspaceID = pNode->workspaceID;
         applyNodeDataToWindow(pNode);
         pNode->isInOldLayout = false;
@@ -230,6 +228,10 @@ void OvGridLayout::calculateWorkspace(const int &ws)
         return;
     }
 
+    static const auto *PBORDERSIZE = &g_hycov_bordersize;
+    static const auto *GAPPO = &g_hycov_overview_gappo;
+    static const auto *GAPPI = &g_hycov_overview_gappi;
+
     /*
     m is region that is moniotr,
     w is region that is monitor but don not contain bar  
@@ -263,10 +265,10 @@ void OvGridLayout::calculateWorkspace(const int &ws)
     if (NODECOUNT == 1)
     {
         pNode = pTempNodes[0];
-        cw = (w_width - 2 * (g_hycov_overview_gappo)) * 0.7;
-        ch = (w_height - 2 * (g_hycov_overview_gappo)) * 0.8;
+        cw = (w_width - 2 * (*GAPPO)) * 0.7;
+        ch = (w_height - 2 * (*GAPPO)) * 0.8;
         resizeNodeSizePos(pNode, w_x + (int)((m_width - cw) / 2), w_y + (int)((w_height - ch) / 2),
-                          cw - 2 * (g_hycov_bordersize), ch - 2 * (g_hycov_bordersize));
+                          cw - 2 * (*PBORDERSIZE), ch - 2 * (*PBORDERSIZE));
         delete[] pTempNodes;
         return;
     }
@@ -275,12 +277,12 @@ void OvGridLayout::calculateWorkspace(const int &ws)
     if (NODECOUNT == 2)
     {
         pNode = pTempNodes[0];
-        cw = (w_width - 2 * (g_hycov_overview_gappo) - (g_hycov_overview_gappi)) / 2;
-        ch = (w_height - 2 * (g_hycov_overview_gappo)) * 0.65;
-        resizeNodeSizePos(pNode, m_x + cw + (g_hycov_overview_gappo) + (g_hycov_overview_gappi), m_y + (m_height - ch) / 2 + (g_hycov_overview_gappo),
-                          cw - 2 * (g_hycov_bordersize), ch - 2 * (g_hycov_bordersize));
-        resizeNodeSizePos(pTempNodes[1], m_x + (g_hycov_overview_gappo), m_y + (m_height - ch) / 2 + (g_hycov_overview_gappo),
-                          cw - 2 * (g_hycov_bordersize), ch - 2 * (g_hycov_bordersize));
+        cw = (w_width - 2 * (*GAPPO) - (*GAPPI)) / 2;
+        ch = (w_height - 2 * (*GAPPO)) * 0.65;
+        resizeNodeSizePos(pNode, m_x + cw + (*GAPPO) + (*GAPPI), m_y + (m_height - ch) / 2 + (*GAPPO),
+                          cw - 2 * (*PBORDERSIZE), ch - 2 * (*PBORDERSIZE));
+        resizeNodeSizePos(pTempNodes[1], m_x + (*GAPPO), m_y + (m_height - ch) / 2 + (*GAPPO),
+                          cw - 2 * (*PBORDERSIZE), ch - 2 * (*PBORDERSIZE));
         delete[] pTempNodes;
         return;
     }
@@ -298,24 +300,24 @@ void OvGridLayout::calculateWorkspace(const int &ws)
 
     //Calculate the width and height of the layout area based on 
     //the number of rows and columns
-    ch = (int)((w_height - 2 * (g_hycov_overview_gappo) - (rows - 1) * (g_hycov_overview_gappi)) / rows);
-    cw = (int)((w_width - 2 * (g_hycov_overview_gappo) - (cols - 1) * (g_hycov_overview_gappi)) / cols);
+    ch = (int)((w_height - 2 * (*GAPPO) - (rows - 1) * (*GAPPI)) / rows);
+    cw = (int)((w_width - 2 * (*GAPPO) - (cols - 1) * (*GAPPI)) / cols);
 
     //If the nodes do not exactly fill all rows, 
     //the number of Windows in the unfilled rows is
     overcols = NODECOUNT % cols;
 
     if (overcols)
-        dx = (int)((w_width - overcols * cw - (overcols - 1) * (g_hycov_overview_gappi)) / 2) - (g_hycov_overview_gappo);
+        dx = (int)((w_width - overcols * cw - (overcols - 1) * (*GAPPI)) / 2) - (*GAPPO);
     for (i = 0, pNode = pTempNodes[0]; pNode; pNode = pTempNodes[i + 1], i++)
     {
-        cx = w_x + (i % cols) * (cw + (g_hycov_overview_gappi));
-        cy = w_y + (int)(i / cols) * (ch + (g_hycov_overview_gappi));
+        cx = w_x + (i % cols) * (cw + (*GAPPI));
+        cy = w_y + (int)(i / cols) * (ch + (*GAPPI));
         if (overcols && i >= (NODECOUNT-overcols))
         {
             cx += dx;
         }
-        resizeNodeSizePos(pNode, cx + (g_hycov_overview_gappo), cy + (g_hycov_overview_gappo), cw - 2 * (g_hycov_bordersize), ch - 2 * (g_hycov_bordersize));
+        resizeNodeSizePos(pNode, cx + (*GAPPO), cy + (*GAPPO), cw - 2 * (*PBORDERSIZE), ch - 2 * (*PBORDERSIZE));
     }
     delete[] pTempNodes;
 }
@@ -343,8 +345,6 @@ void OvGridLayout::applyNodeDataToWindow(SOvGridNodeData *pNode)
 
     const auto pWindow = pNode->pWindow;
 
-    const auto WORKSPACERULE = g_pConfigManager->getWorkspaceRuleFor(g_pCompositor->getWorkspaceByID(pWindow->m_iWorkspaceID));
-    pWindow->updateSpecialRenderData();
     // force disable decorate and shadow
     // pWindow->m_sSpecialRenderData.decorate = false;
     // pWindow->m_sSpecialRenderData.shadow   = false;
@@ -352,7 +352,6 @@ void OvGridLayout::applyNodeDataToWindow(SOvGridNodeData *pNode)
     // force enable bordear and rounding
     pWindow->m_sSpecialRenderData.border   = true;
     pWindow->m_sSpecialRenderData.rounding = true;
-    pWindow->m_sSpecialRenderData.borderSize = WORKSPACERULE.borderSize.value_or(-1);
 
     pWindow->m_vSize = pNode->size;
     pWindow->m_vPosition = pNode->position;

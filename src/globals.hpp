@@ -42,6 +42,7 @@ inline int g_hycov_overview_gappo;
 inline int g_hycov_overview_gappi;
 inline std::string g_hycov_configLayoutName;
 
+
 inline bool g_hycov_isOverViewExiting;
 inline bool g_hycov_forece_display_all = false;
 inline bool g_hycov_forece_display_all_in_one_monitor = false;
@@ -56,13 +57,14 @@ inline CFunctionHook* g_hycov_pSpawnHook = nullptr;
 inline CFunctionHook* g_hycov_pStartAnimHook = nullptr;
 inline CFunctionHook* g_hycov_pFullscreenActiveHook = nullptr;
 inline CFunctionHook* g_hycov_pOnKeyboardKeyHook = nullptr;
-inline CFunctionHook* g_hycov_pHyprDwindleLayout_recalculateMonitor = nullptr;
-inline CFunctionHook* g_hycov_pHyprMasterLayout_recalculateMonitor = nullptr;
-inline CFunctionHook* g_hycov_pHyprDwindleLayout_recalculateWindow = nullptr;
-inline CFunctionHook* g_hycov_pSDwindleNodeData_recalcSizePosRecursive = nullptr;
-inline CFunctionHook* g_hycov_pCInputManager_onMouseButton = nullptr;
-inline CFunctionHook* g_hycov_pCKeybindManager_changeGroupActive = nullptr;
-
+inline CFunctionHook* g_hycov_pHyprDwindleLayout_recalculateMonitorHook = nullptr;
+inline CFunctionHook* g_hycov_pHyprMasterLayout_recalculateMonitorHook = nullptr;
+inline CFunctionHook* g_hycov_pHyprDwindleLayout_recalculateWindowHook = nullptr;
+inline CFunctionHook* g_hycov_pSDwindleNodeData_recalcSizePosRecursiveHook = nullptr;
+inline CFunctionHook* g_hycov_pCInputManager_onMouseButtonHook = nullptr;
+inline CFunctionHook* g_hycov_pCKeybindManager_changeGroupActiveHook = nullptr;  
+inline CFunctionHook* g_hycov_pCKeybindManager_toggleGroupHook = nullptr;
+inline CFunctionHook* g_hycov_pCKeybindManager_moveOutOfGroupHook = nullptr;
 
 inline void errorNotif()
 {
