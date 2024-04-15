@@ -2,8 +2,7 @@
 A Hyprland overview mode plugin, a new tiling WM workflow.  
 
 > [!NOTE]
-> Sorry guys, because I've been using my own Hyprland branch and the features have been sufficient for me.
-> If hyprland comes up with features that surprise me, maybe I'll come back, but I don't have time to keep track of his every commit right now, so I decided to stop it temporarily.
+> This repository only maintains the hyprland version corresponding to each hycov release, please do not bring up the issue of non-release versions, because I do not have enough time to track every commit.
 
 ### What can it do?
 - Hycov can tile all of your windows in a single workspace via grid layout.
@@ -26,7 +25,7 @@ Anyone is welcome to fork. If you end up improving the plugin, please let me kno
 > [!NOTE]
 > 1. After Hycov is installed, you will need to logout, then log back in. This may happen automatically, but do not worry. This behaviour is normal.
 > 2. Only supports hyprland source code after 2023-10-22, because the plugin requires this [commit](https://github.com/hyprwm/Hyprland/commit/a61eb7694df25a75f45502ed64b1536fda370c1d) in [hyprland](https://github.com/hyprwm/Hyprland).
-> 3. Each release of hycov corresponds to each release of hyprland. If you are using a release version of hyprland, but you are using the latest hycov-git, this may not be available. Therefore, hyprland-git is recommended to use hycov-git and hyprland-release is recommended to use the corresponding hycov-release.
+> 3. Each release of hycov corresponds to each release of hyprland. If you are using a release version of hycov, but you are using the latest hyprland-git, this may not be available. 
 
 ##### Using meson and ninja:
 
