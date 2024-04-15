@@ -403,6 +403,9 @@ void dispatch_enteroverview(std::string arg)
 
 	}
 
+	// enable hook fullscreenActive funciton
+  	g_hycov_pFullscreenActiveHook->hook();
+
 	//disable changeworkspace
 	if(g_hycov_disable_workspace_change) {
   		g_hycov_pChangeworkspaceHook->hook();
@@ -586,6 +589,10 @@ void dispatch_leaveoverview(std::string arg)
 
 	//mark has exited overview mode
 	g_hycov_isOverViewExiting = false;
+
+	// disable hook fullscreenActive funciton
+  	g_hycov_pFullscreenActiveHook->unhook();
+
 	return;
 }
 

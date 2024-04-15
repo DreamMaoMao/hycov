@@ -256,9 +256,7 @@ static void hkFullscreenActive(std::string args) {
   if (!pWindow)
         return;
 
-  auto pNode = g_hycov_OvGridLayout->getNodeFromWindow(pWindow);
-
-  if (g_pCompositor->isWorkspaceSpecial(pNode->workspaceID))
+  if (pWindow->m_pWorkspace->m_bIsSpecialWorkspace)
         return;
 
   if (g_hycov_isOverView && want_auto_fullscren(pWindow) && !g_hycov_auto_fullscreen) {
@@ -428,6 +426,4 @@ void registerGlobalEventHook()
       g_hycov_pOnKeyboardKeyHook->hook();
   }
 
-  // enable hook fullscreenActive funciton
-  g_hycov_pFullscreenActiveHook->hook();
 }
