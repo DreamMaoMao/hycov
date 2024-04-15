@@ -286,3 +286,31 @@ sudo rm -rf /usr/local/include/wlr
 #step3
 yay -S  wlroots-git hyprland-git
 ```
+
+
+## Some cool use cases
+<details>
+<summary> hycov + [hyprland-easymotion](https://github.com/zakk4223/hyprland-easymotion) </summary>
+
+
+https://github.com/DreamMaoMao/hycov/assets/30348075/486b08f1-be0d-4647-90a3-2029961402cd
+
+
+```conf
+bind = ALT,tab, exec, ~/.config/hypr/scripts/hycov-easymotion.sh
+```
+
+```bash
+#!/bin/bash
+
+workspace_name=$(hyprctl -j activeworkspace | jq -r '.name')
+
+if [ "$workspace_name" = "OVERVIEW" ]; then
+    hyprctl dispatch hycov:toggleoverview
+else
+    hyprctl dispatch hycov:toggleoverview
+    hyprctl dispatch 'easymotion action:hyprctl --batch "dispatch focuswindow address:{} ; dispatch hycov:toggleoverview"'
+fi
+```
+
+</details>
