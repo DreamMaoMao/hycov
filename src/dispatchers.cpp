@@ -247,6 +247,10 @@ CWindow *direction_select(std::string arg){
 CWindow *get_circle_next_window (std::string arg) {
 	bool next_ready = false;
 	CWindow *pTempClient =  g_pCompositor->m_pLastWindow;
+
+	if(!pTempClient)
+		return nullptr;
+
     for (auto &w : g_pCompositor->m_vWindows)
     {
 		CWindow *pWindow = w.get();
