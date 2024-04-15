@@ -61,6 +61,7 @@ public:
   virtual void switchWindows(CWindow *, CWindow *);
   virtual void alterSplitRatio(CWindow *, float, bool);
   virtual std::string getLayoutName();
+  virtual Vector2D predictSizeForNewWindowTiled();
   virtual void replaceWindowDataWith(CWindow *from, CWindow *to);
   virtual void moveWindowTo(CWindow *, const std::string &dir);
   virtual void onEnable();

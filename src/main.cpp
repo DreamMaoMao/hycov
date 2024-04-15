@@ -65,6 +65,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 	static const auto *pAlt_replace_key = (Hyprlang::STRING const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:alt_replace_key")->getDataStaticPtr());
   	static const auto *pHotarea_monitor_config = (Hyprlang::STRING const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:hotarea_monitor")->getDataStaticPtr());
 	static const auto *pConfigLayoutName = (Hyprlang::STRING const*)(HyprlandAPI::getConfigValue(PHANDLE, "general:layout")->getDataStaticPtr());
+	static const auto *pGroupBarHeight = (Hyprlang::STRING const*)(HyprlandAPI::getConfigValue(PHANDLE, "group:groupbar:height")->getDataStaticPtr());
 
 
 	// int value
@@ -92,6 +93,8 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 	g_hycov_alt_replace_key = *pAlt_replace_key;
 	g_hycov_hotarea_monitor = *pHotarea_monitor_config;
 	g_hycov_configLayoutName = *pConfigLayoutName;
+
+	g_hycov_groupBarHeight= **pGroupBarHeight;
 
 
 	g_hycov_OvGridLayout = std::make_unique<OvGridLayout>();

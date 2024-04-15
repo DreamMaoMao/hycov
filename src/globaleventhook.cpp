@@ -185,10 +185,10 @@ static void hkCWindow_onUnmap(void* thisptr) {
   auto nodeNumInSameMonitor = 0;
   auto nodeNumInSameWorkspace = 0;
 	for (auto &n : g_hycov_OvGridLayout->m_lOvGridNodesData) {
-		if(n.pWindow->m_iMonitorID == g_pCompositor->m_pLastMonitor->ID && !g_pCompositor->isWorkspaceSpecial(n.pWindow->m_iWorkspaceID)) {
+		if(n.pWindow->m_iMonitorID == g_pCompositor->m_pLastMonitor->ID && !g_pCompositor->isWorkspaceSpecial(n.workspaceID)) {
 			nodeNumInSameMonitor++;
 		}
-		if(n.pWindow->m_iWorkspaceID == g_pCompositor->m_pLastMonitor->activeWorkspace) {
+		if(n.pWindow->m_pWorkspace == g_pCompositor->m_pLastMonitor->activeWorkspace) {
 			nodeNumInSameWorkspace++;
 		}
 	}
@@ -256,7 +256,9 @@ static void hkFullscreenActive(std::string args) {
   if (!pWindow)
         return;
 
-  if (g_pCompositor->isWorkspaceSpecial(pWindow->m_iWorkspaceID))
+  auto pNode = g_hycov_OvGridLayout->getNodeFromWindow(pWindow);
+
+  if (g_pCompositor->isWorkspaceSpecial(pNode->workspaceID))
         return;
 
   if (g_hycov_isOverView && want_auto_fullscren(pWindow) && !g_hycov_auto_fullscreen) {
@@ -328,7 +330,7 @@ void hkCKeybindManager_changeGroupActive(std::string args) {
     pNode->pWindow = pTargetWindow;
     pNode->pGroupPrevWindow = pTargetWindow->getGroupPrevious();
     pNode->pGroupNextWindow = pTargetWindow->m_sGroupData.pNextWindow;
-    pNode->pWindow->m_iWorkspaceID = pNode->workspaceID;
+    pNode->pWindow->m_pWorkspace = g_pCompositor->getWorkspaceByID(pNode->workspaceID);
     
     PWINDOW->setGroupCurrent(pTargetWindow);
     g_hycov_OvGridLayout->applyNodeDataToWindow(pNode);
