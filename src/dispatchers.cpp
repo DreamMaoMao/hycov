@@ -319,7 +319,7 @@ void dispatch_enteroverview(std::string arg)
 	}
 
 	const auto pMonitor = g_pCompositor->m_pLastMonitor;
-	if(pMonitor->activeWorkspaceID() != 0)
+	if(pMonitor->activeSpecialWorkspaceID() != 0)
 		pMonitor->setSpecialWorkspace(nullptr);
 
 	//force display all workspace window,ignore `only_active_worksapce` and `only_active_monitor`
@@ -428,7 +428,7 @@ void dispatch_leaveoverview(std::string arg)
 	}
 
 	const auto pMonitor = g_pCompositor->m_pLastMonitor;
-	if(pMonitor->activeWorkspaceID() != 0)
+	if(pMonitor->activeSpecialWorkspaceID() != 0)
 		pMonitor->setSpecialWorkspace(nullptr);
 	
 	// get default layout
