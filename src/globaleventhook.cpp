@@ -224,13 +224,8 @@ static void hkSpawn(std::string args) {
 
 static void hkStartAnim(void* thisptr,bool in, bool left, bool instant = false) {
   // if is exiting overview, omit the animation of workspace change (instant = true)
-  if (g_hycov_isOverViewExiting) {
     (*(origStartAnim)g_hycov_pStartAnimHook->m_pOriginal)(thisptr, in, left, true);
     hycov_log(LOG,"hook startAnim,disable workspace change anim,in:{},isOverview:{}",in,g_hycov_isOverView);
-  } else {
-    (*(origStartAnim)g_hycov_pStartAnimHook->m_pOriginal)(thisptr, in, left, instant);
-    // hycov_log(LOG,"hook startAnim,enable workspace change anim,in:{},isOverview:{}",in,g_hycov_isOverView);
-  }
 }
 
 static void hkOnKeyboardKey(void* thisptr,wlr_keyboard_key_event* e, SKeyboard* pKeyboard) {
@@ -361,7 +356,6 @@ void registerGlobalEventHook()
 
   // hook function of workspace change animation start
   g_hycov_pStartAnimHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CWorkspace::startAnim, (void*)&hkStartAnim);
-  g_hycov_pStartAnimHook->hook();
 
   //  hook function of keypress
   g_hycov_pOnKeyboardKeyHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::onKeyboardKey, (void*)&hkOnKeyboardKey);

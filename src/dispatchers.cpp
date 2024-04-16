@@ -433,6 +433,8 @@ void dispatch_leaveoverview(std::string arg)
 		return;
 	}
 
+	g_hycov_pStartAnimHook->hook();
+
 	const auto pMonitor = g_pCompositor->m_pLastMonitor;
 	if(pMonitor->specialWorkspaceID != 0)
 		pMonitor->setSpecialWorkspace(nullptr);
@@ -470,6 +472,7 @@ void dispatch_leaveoverview(std::string arg)
 		recalculateAllMonitor();
 		g_hycov_OvGridLayout->m_lOvGridNodesData.clear();
 		g_hycov_isOverViewExiting = false;
+		g_hycov_pStartAnimHook->unhook();
 		return;
 	}
 
@@ -592,6 +595,7 @@ void dispatch_leaveoverview(std::string arg)
 
 	//mark has exited overview mode
 	g_hycov_isOverViewExiting = false;
+	g_hycov_pStartAnimHook->unhook();
 	return;
 }
 
