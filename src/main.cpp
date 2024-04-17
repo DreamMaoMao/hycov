@@ -32,6 +32,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 	CONF("height_of_titlebar", 0L);
 	CONF("hotarea_monitor", "all");
 	CONF("alt_replace_key", "Alt_L");
+	CONF("show_special",  0L);
 
 
 #undef CONF
@@ -59,6 +60,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
     static const auto *pBordersize = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "general:border_size")->getDataStaticPtr());
     static const auto *pOverview_gappo = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:overview_gappo")->getDataStaticPtr());
     static const auto *pOverview_gappi = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:overview_gappi")->getDataStaticPtr());
+	static const auto *pShow_special_config = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:show_special")->getDataStaticPtr());
 
 
 	// string value
@@ -88,6 +90,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 	g_hycov_bordersize = **pBordersize;
 	g_hycov_overview_gappo = **pOverview_gappo;
 	g_hycov_overview_gappi = **pOverview_gappi;
+	g_hycov_show_special = **pShow_special_config;
 
 	// string value
 	g_hycov_alt_replace_key = *pAlt_replace_key;

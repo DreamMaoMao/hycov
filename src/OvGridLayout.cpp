@@ -123,7 +123,7 @@ void OvGridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
 
 
     //change all client(exclude special workspace) to active worksapce 
-    if (!g_pCompositor->isWorkspaceSpecial(pNode->workspaceID) && pNode->isInOldLayout && (pWindowOriWorkspace->m_iID != pActiveWorkspace->m_iID || pWindowOriWorkspace->m_szName != pActiveWorkspace->m_szName) && (!g_hycov_only_active_workspace || g_hycov_forece_display_all || g_hycov_forece_display_all_in_one_monitor))    {
+    if ((!g_pCompositor->isWorkspaceSpecial(pNode->workspaceID) || g_hycov_show_special) && pNode->isInOldLayout && (pWindowOriWorkspace->m_iID != pActiveWorkspace->m_iID || pWindowOriWorkspace->m_szName != pActiveWorkspace->m_szName) && (!g_hycov_only_active_workspace || g_hycov_forece_display_all || g_hycov_forece_display_all_in_one_monitor))    {
         pWindow->m_pWorkspace = pActiveWorkspace;
         pNode->workspaceID = pWindow->m_pWorkspace->m_iID;
         pNode->workspaceName = pActiveWorkspace->m_szName;

@@ -41,6 +41,7 @@ inline int g_hycov_bordersize;
 inline int g_hycov_overview_gappo;
 inline int g_hycov_overview_gappi;
 inline std::string g_hycov_configLayoutName;
+inline int g_hycov_show_special;
 
 
 inline bool g_hycov_isOverViewExiting;

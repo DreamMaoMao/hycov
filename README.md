@@ -107,6 +107,7 @@ plugin {
         alt_toggle_auto_next = 0 # auto focus next window when toggle overview in alt swith mode
         click_in_cursor = 1 # when click to jump,the target windwo is find by cursor, not the current foucus window.
         hight_of_titlebar = 0 # height deviation of title bar height
+        show_special = 0 # show windwos in special workspace in overview.
 
     }
 }
