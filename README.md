@@ -299,6 +299,9 @@ https://github.com/DreamMaoMao/hycov/assets/30348075/486b08f1-be0d-4647-90a3-202
 
 ```conf
 bind = ALT,tab, exec, ~/.config/hypr/scripts/hycov-easymotion.sh
+submap=__easymotionsubmap__ 
+bind = ALT, Tab, exec, ~/.config/hypr/scripts/hycov-easymotion.sh
+submap=reset
 ```
 
 ```bash
@@ -307,10 +310,10 @@ bind = ALT,tab, exec, ~/.config/hypr/scripts/hycov-easymotion.sh
 workspace_name=$(hyprctl -j activeworkspace | jq -r '.name')
 
 if [ "$workspace_name" = "OVERVIEW" ]; then
-    hyprctl dispatch hycov:toggleoverview
+    hyprctl dispatch hycov:leaveoverview
 else
-    hyprctl dispatch hycov:toggleoverview
-    hyprctl dispatch 'easymotion action:hyprctl --batch "dispatch focuswindow address:{} ; dispatch hycov:toggleoverview"'
+    hyprctl dispatch hycov:enteroverview
+    hyprctl dispatch 'easymotion action:hyprctl --batch "dispatch focuswindow address:{} ; dispatch hycov:leaveoverview"'
 fi
 ```
 
