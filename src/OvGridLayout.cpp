@@ -97,8 +97,6 @@ void OvGridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
     //record the previcous window in group
     if(pWindow->m_sGroupData.pNextWindow && pWindow->getGroupCurrent() == pWindow) {
         pNode->isGroupActive = true;
-        pNode->pGroupPrevWindow = pWindow->getGroupPrevious();
-        pNode->pGroupNextWindow = pWindow->m_sGroupData.pNextWindow;
 	}
 
     pNode->workspaceID = pWindow->m_pWorkspace->m_iID; // encapsulate window objects as node objects to bind more properties
@@ -178,6 +176,66 @@ void OvGridLayout::removeOldLayoutData(CWindow *pWindow) {
     switchToLayoutWithoutReleaseData("ovgrid");
 }
 
+void OvGridLayout::onWindowRemoved(CWindow* pWindow) {
+    const auto pNode = getNodeFromWindow(pWindow);
+
+    if (!pNode)
+        return;
+
+    if(pNode->isInOldLayout) { // if client is taken from the old layout
+        removeOldLayoutData(pWindow);
+    }
+
+    if (pWindow->m_bIsFullscreen)
+        g_pCompositor->setWindowFullscreen(pWindow, false, FULLSCREEN_FULL);
+
+
+    if (pWindow->m_sGroupData.pNextWindow) {
+        if (pWindow->m_sGroupData.pNextWindow == pWindow)
+            pWindow->m_sGroupData.pNextWindow = nullptr;
+        else {
+
+            // find last window and update
+            CWindow*   PWINDOWPREV     = pWindow->getGroupPrevious();
+            const auto WINDOWISVISIBLE = pWindow->getGroupCurrent() == pWindow;
+
+            if (WINDOWISVISIBLE)
+                PWINDOWPREV->setGroupCurrent(pWindow->m_sGroupData.head ? pWindow->m_sGroupData.pNextWindow : PWINDOWPREV);
+
+            PWINDOWPREV->m_sGroupData.pNextWindow = pWindow->m_sGroupData.pNextWindow;
+
+            pWindow->m_sGroupData.pNextWindow = nullptr;
+
+            if (pWindow->m_sGroupData.head) {
+                std::swap(PWINDOWPREV->m_sGroupData.pNextWindow->m_sGroupData.head, pWindow->m_sGroupData.head);
+                std::swap(PWINDOWPREV->m_sGroupData.pNextWindow->m_sGroupData.locked, pWindow->m_sGroupData.locked);
+            }
+
+            pWindow->setHidden(false);
+
+            pWindow->updateWindowDecos();
+            PWINDOWPREV->getGroupCurrent()->updateWindowDecos();
+            g_pCompositor->updateWindowAnimatedDecorationValues(pWindow);
+
+            // change node bind window in group
+            pNode->pWindow = pWindow->m_sGroupData.head ? pWindow->m_sGroupData.pNextWindow : PWINDOWPREV;
+            pNode->pWindow->m_pWorkspace = g_pCompositor->getWorkspaceByID(pNode->workspaceID);
+            applyNodeDataToWindow(pNode);
+            pNode->isInOldLayout = false;
+            hycov_log(LOG,"change node bind window in group,old:{} new:{}",pWindow,pNode->pWindow);
+
+            return;
+        }
+    }
+
+    if (pWindow->m_bIsFloating) {
+        onWindowRemovedFloating(pWindow);
+    } else {
+        onWindowRemovedTiling(pWindow);
+    }
+
+}
+
 void OvGridLayout::onWindowRemovedTiling(CWindow *pWindow)
 {
     hycov_log(LOG,"remove tiling windwo:{}",pWindow);
@@ -192,15 +250,12 @@ void OvGridLayout::onWindowRemovedTiling(CWindow *pWindow)
     }
 
     // if window is in a group,replace it with other window in same group
-    if(pNode->isGroupActive && pNode->pGroupPrevWindow && pNode->pGroupPrevWindow != pNode->pWindow) {
-        pNode->pWindow = pNode->pGroupPrevWindow;
-        pNode->pGroupPrevWindow = pNode->pGroupPrevWindow->getGroupPrevious();
-        pNode->pWindow->m_pWorkspace = g_pCompositor->getWorkspaceByID(pNode->workspaceID);
-        applyNodeDataToWindow(pNode);
-        pNode->isInOldLayout = false;
-        g_pCompositor->focusWindow(pNode->pWindow);
-        return;
-    }
+    //     pNode->pWindow->m_pWorkspace = g_pCompositor->getWorkspaceByID(pNode->workspaceID);
+    //     applyNodeDataToWindow(pNode);
+    //     pNode->isInOldLayout = false;
+    //     g_pCompositor->focusWindow(pNode->pWindow);
+    //     return;
+    // }
 
     m_lOvGridNodesData.remove(*pNode);
 
