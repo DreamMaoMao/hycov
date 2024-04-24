@@ -23,8 +23,6 @@ struct SOvGridNodeData
   bool ovbk_windowIsWithShadow;
   bool isInOldLayout = false;
   bool isGroupActive = false;
-  CWindow* pGroupPrevWindow = nullptr;
-  CWindow* pGroupNextWindow = nullptr;
 
   int workspaceID = -1;
 
@@ -49,6 +47,7 @@ class OvGridLayout : public IHyprLayout
 {
 public:
   virtual void onWindowCreatedTiling(CWindow *, eDirection direction = DIRECTION_DEFAULT);
+  virtual void onWindowRemoved(CWindow* pWindow);
   virtual void onWindowRemovedTiling(CWindow *);
   virtual bool isWindowTiled(CWindow *);
   virtual CWindow* getNextWindowCandidate(CWindow*);

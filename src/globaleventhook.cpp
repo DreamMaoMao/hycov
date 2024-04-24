@@ -308,9 +308,9 @@ void hkCKeybindManager_changeGroupActive(std::string args) {
       return;
 
     if (args != "b" && args != "prev") {
-        pTargetWindow = pNode->pGroupNextWindow;
+        pTargetWindow = PWINDOW->m_sGroupData.pNextWindow;
     } else {
-        pTargetWindow = pNode->pGroupPrevWindow;
+        pTargetWindow = PWINDOW->getGroupPrevious();
     }  
 
     hycov_log(LOG,"changeGroupActive,pTargetWindow:{}",pTargetWindow);
@@ -321,8 +321,6 @@ void hkCKeybindManager_changeGroupActive(std::string args) {
     }
 
     pNode->pWindow = pTargetWindow;
-    pNode->pGroupPrevWindow = pTargetWindow->getGroupPrevious();
-    pNode->pGroupNextWindow = pTargetWindow->m_sGroupData.pNextWindow;
     pNode->pWindow->m_iWorkspaceID = pNode->workspaceID;
     
     PWINDOW->setGroupCurrent(pTargetWindow);
