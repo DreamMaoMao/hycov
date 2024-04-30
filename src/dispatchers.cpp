@@ -510,18 +510,18 @@ void dispatch_leaveoverview(std::string arg)
 			n.pWindow->m_vRealSize = n.ovbk_size;
 			n.pWindow->m_vRealPosition = n.ovbk_position;
 
-			auto calcPos = n.ovbk_position;
-			auto calcSize = n.ovbk_size;
+			// auto calcPos = n.ovbk_position;
+			// auto calcSize = n.ovbk_size;
 
-			n.pWindow->m_vRealSize = calcSize;
-			n.pWindow->m_vRealPosition = calcPos;
+			// n.pWindow->m_vRealSize = calcSize;
+			// n.pWindow->m_vRealPosition = calcPos;
 
 			// some app sometime can't catch window size to restore,don't use dirty data,remove refer data in old layout.
 			if (n.ovbk_size.x == 0 && n.ovbk_size.y == 0 && n.isInOldLayout) {
 				g_hycov_OvGridLayout->removeOldLayoutData(n.pWindow);
 				n.isInOldLayout = false;
 			} else {
-				g_pXWaylandManager->setWindowSize(n.pWindow, calcSize);	
+				g_pXWaylandManager->setWindowSize(n.pWindow, n.ovbk_size);	
 			}	
 
 			// restore active window in group
