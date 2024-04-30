@@ -136,7 +136,7 @@ static void toggle_hotarea(int x_root, int y_root)
   }
 }
 
-static void mouseMoveHook(void *, SCallbackInfo &info, std::any data)
+static void hkmouseMove(void *, SCallbackInfo &info, std::any data)
 {
   const Vector2D coordinate = std::any_cast<const Vector2D>(data);
   toggle_hotarea(coordinate.x, coordinate.y);
@@ -150,7 +150,7 @@ static void hkCInputManager_onMouseButton(void* thisptr, wlr_pointer_button_even
         g_pInputManager->refocus();
     }
 
-    if (!g_pCompositor->m_pLastWindow) {
+    if (!g_pCompositor->m_pLastWindow.lock()) {
       return;
     }
 
@@ -166,7 +166,7 @@ static void hkCInputManager_onMouseButton(void* thisptr, wlr_pointer_button_even
     case BTN_RIGHT:
       if (g_hycov_isOverView && e->state == WLR_BUTTON_PRESSED)
       {
-        g_pCompositor->closeWindow(g_pCompositor->m_pLastWindow);
+        g_pCompositor->closeWindow(g_pCompositor->m_pLastWindow.lock());
         return;
       }
       break;
@@ -251,7 +251,7 @@ static void hkFullscreenActive(std::string args) {
   hycov_log(LOG,"FullscreenActive hook toggle");
 
   // (*(origFullscreenActive)g_hycov_pFullscreenActiveHook->m_pOriginal)(args);
-  const auto pWindow = g_pCompositor->m_pLastWindow;
+  const auto pWindow = g_pCompositor->m_pLastWindow.lock();
 
   if (!pWindow)
         return;
@@ -297,15 +297,15 @@ void hkCKeybindManager_moveOutOfGroup(std::string args) {
 }
 
 void hkCKeybindManager_changeGroupActive(std::string args) {
-    const auto PWINDOW = g_pCompositor->m_pLastWindow;
-    CWindow *pTargetWindow;
+    const auto PWINDOW = g_pCompositor->m_pLastWindow.lock();
+    PHLWINDOW pTargetWindow;
     if (!PWINDOW)
         return;
 
-    if (!PWINDOW->m_sGroupData.pNextWindow)
+    if (!PWINDOW->m_sGroupData.pNextWindow.lock())
         return;
 
-    if (PWINDOW->m_sGroupData.pNextWindow == PWINDOW)
+    if (PWINDOW->m_sGroupData.pNextWindow.lock() == PWINDOW)
         return;
 
     auto pNode =  g_hycov_OvGridLayout->getNodeFromWindow(PWINDOW);
@@ -313,7 +313,7 @@ void hkCKeybindManager_changeGroupActive(std::string args) {
       return;
 
     if (args != "b" && args != "prev") {
-        pTargetWindow = PWINDOW->m_sGroupData.pNextWindow;
+        pTargetWindow = PWINDOW->m_sGroupData.pNextWindow.lock();
     } else {
         pTargetWindow = PWINDOW->getGroupPrevious();
     }  
@@ -404,7 +404,7 @@ void registerGlobalEventHook()
   //register pEvent hook
   if(g_hycov_enable_hotarea){
     g_hycov_pCInputManager_onMouseButtonHook->hook();
-    HyprlandAPI::registerCallbackDynamic(PHANDLE, "mouseMove",[&](void* self, SCallbackInfo& info, std::any data) { mouseMoveHook(self, info, data); });
+    static auto mouseMoveHook = HyprlandAPI::registerCallbackDynamic(PHANDLE, "mouseMove",[&](void* self, SCallbackInfo& info, std::any data) { hkmouseMove(self, info, data); });
   }
 
   //if enable gesture, apply hook Swipe function 

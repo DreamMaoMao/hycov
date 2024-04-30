@@ -24,7 +24,7 @@ void switchToLayoutWithoutReleaseData(std::string layout) {
     hycov_log(ERR, "Unknown layout!");
 }
 
-bool want_auto_fullscren(CWindow *pWindow) {
+bool want_auto_fullscren(PHLWINDOW pWindow) {
 	int nodeNumInTargetWorkspace = 1;
 
 	if(!pWindow) {
@@ -81,11 +81,11 @@ std::optional<ShiftDirection> parseShiftArg(std::string arg) {
 	else return {};
 }
 
-CWindow *direction_select(std::string arg){
-	CWindow *pTempClient =  g_pCompositor->m_pLastWindow;
+PHLWINDOW direction_select(std::string arg){
+	PHLWINDOW pTempClient =  g_pCompositor->m_pLastWindow.lock();
 	auto dataSize =  g_pCompositor->m_vWindows.size();
-	auto pTempCWindows = new CWindow*[dataSize + 1];
-	CWindow *pTempFocusCWindows = nullptr;
+	auto pTempCWindows = new PHLWINDOW[dataSize + 1];
+	PHLWINDOW pTempFocusCWindows = nullptr;
 	int last = -1;
 	if(!pTempClient){
 		delete[] pTempCWindows;
@@ -103,7 +103,7 @@ CWindow *direction_select(std::string arg){
 
     for (auto &w : g_pCompositor->m_vWindows)
     {
-		CWindow *pWindow = w.get();
+		PHLWINDOW pWindow = w;
 
         if (pTempClient == pWindow || pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut || pWindow->m_bIsFullscreen) {
 			continue;
@@ -244,16 +244,16 @@ CWindow *direction_select(std::string arg){
   	return pTempFocusCWindows;
 }
 
-CWindow *get_circle_next_window (std::string arg) {
+PHLWINDOW get_circle_next_window (std::string arg) {
 	bool next_ready = false;
-	CWindow *pTempClient =  g_pCompositor->m_pLastWindow;
+	PHLWINDOW pTempClient =  g_pCompositor->m_pLastWindow.lock();
 
 	if(!pTempClient)
 		return nullptr;
 
     for (auto &w : g_pCompositor->m_vWindows)
     {
-		CWindow *pWindow = w.get();
+		PHLWINDOW pWindow = w;
         if (pTempClient->m_pWorkspace != pWindow->m_pWorkspace || pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut || pWindow->m_bIsFullscreen)
             continue;
 		if (next_ready)
@@ -264,7 +264,7 @@ CWindow *get_circle_next_window (std::string arg) {
 
     for (auto &w : g_pCompositor->m_vWindows)
     {
-		CWindow *pWindow = w.get();
+		PHLWINDOW pWindow = w;
         if (pTempClient->m_pWorkspace != pWindow->m_pWorkspace || pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut || pWindow->m_bIsFullscreen)
             continue;
 		return pWindow;
@@ -272,17 +272,17 @@ CWindow *get_circle_next_window (std::string arg) {
 	return nullptr;
 }
 
-void warpcursor_and_focus_to_window(CWindow *pWindow) {
+void warpcursor_and_focus_to_window(PHLWINDOW pWindow) {
 	g_pCompositor->focusWindow(pWindow);
 	g_pCompositor->warpCursorTo(pWindow->middle());
 	g_pInputManager->m_pForcedFocus = pWindow;
     g_pInputManager->simulateMouseMovement();
-    g_pInputManager->m_pForcedFocus = nullptr;
+    g_pInputManager->m_pForcedFocus.lock() = nullptr;
 }
 
 void dispatch_circle(std::string arg)
 {
-	CWindow *pWindow;
+	PHLWINDOW pWindow;
 	pWindow = get_circle_next_window(arg);
 	if(pWindow){
 		warpcursor_and_focus_to_window(pWindow);
@@ -291,7 +291,7 @@ void dispatch_circle(std::string arg)
 
 void dispatch_focusdir(std::string arg)
 {
-	CWindow *pWindow;
+	PHLWINDOW pWindow;
 	pWindow = direction_select(arg);
 	if(pWindow){
 		warpcursor_and_focus_to_window(pWindow);
@@ -343,8 +343,8 @@ void dispatch_enteroverview(std::string arg)
 	}
 
 	//ali clients exit fullscreen status before enter overview
-	CWindow *pFullscreenWindow;
-	CWindow *pActiveWindow = g_pCompositor->m_pLastWindow;
+	PHLWINDOW pFullscreenWindow;
+	PHLWINDOW pActiveWindow = g_pCompositor->m_pLastWindow.lock();
 	PHLWORKSPACE pActiveWorkspace;
 	CMonitor *pActiveMonitor;
 
@@ -352,7 +352,7 @@ void dispatch_enteroverview(std::string arg)
 
     for (auto &w : g_pCompositor->m_vWindows)
     {
-		CWindow *pWindow = w.get();
+		PHLWINDOW pWindow = w;
         if (pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut || pWindow->m_pWorkspace->m_bIsSpecialWorkspace)
             continue;
 		isNoShouldTileWindow = false;
@@ -398,7 +398,7 @@ void dispatch_enteroverview(std::string arg)
 
 	} else { // when no window is showed in current window,find from other workspace to focus(exclude special workspace)
     	for (auto &w : g_pCompositor->m_vWindows) {
-			CWindow *pWindow = w.get();
+			PHLWINDOW pWindow = w;
 			auto node = g_hycov_OvGridLayout->getNodeFromWindow(pWindow);
     	    if ( !node || g_pCompositor->isWorkspaceSpecial(node->workspaceID) || pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut || pWindow->m_bIsFullscreen)
     	        continue;
@@ -532,7 +532,7 @@ void dispatch_leaveoverview(std::string arg)
 	}
 
 	//exit overview layout,go back to old layout
-	CWindow *pActiveWindow = g_pCompositor->m_pLastWindow;
+	PHLWINDOW pActiveWindow = g_pCompositor->m_pLastWindow.lock();
 	g_pCompositor->focusWindow(nullptr);
 	// g_pLayoutManager->switchToLayout(*configLayoutName);
 	// g_pLayoutManager->getCurrentLayout()->onDisable();
@@ -559,11 +559,11 @@ void dispatch_leaveoverview(std::string arg)
 		//make all fullscrenn windwo restore it's status
 		if (n.ovbk_windowIsFullscreen)
 		{
-			if (!g_pCompositor->m_pLastWindow) {
+			if (!g_pCompositor->m_pLastWindow.lock()) {
 				continue;
 			}
 
-			if (n.pWindow != g_pCompositor->m_pLastWindow && n.pWindow->m_pWorkspace == g_pCompositor->m_pLastWindow->m_pWorkspace)
+			if (n.pWindow != g_pCompositor->m_pLastWindow.lock() && n.pWindow->m_pWorkspace == g_pCompositor->m_pLastWindow.lock()->m_pWorkspace)
 			{
 				continue;
 			}	

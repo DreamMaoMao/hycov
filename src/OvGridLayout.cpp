@@ -4,12 +4,12 @@
 #include "dispatchers.hpp"
 
 // find next focus window after remove a window
-CWindow *OvGridLayout::getNextWindowCandidate(CWindow* plastWindow) {
+PHLWINDOW OvGridLayout::getNextWindowCandidate(PHLWINDOW plastWindow) {
 
-    CWindow *targetWindow =  nullptr;
+    PHLWINDOW targetWindow =  nullptr;
     for (auto &w : g_pCompositor->m_vWindows)
     {
-		CWindow *pWindow = w.get();
+		PHLWINDOW pWindow = w;
         if (pWindow->m_pWorkspace != plastWindow->m_pWorkspace || pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut || pWindow->m_bIsFullscreen)
             continue;
 		targetWindow = pWindow; // find the last window that is in same workspace with the remove window
@@ -19,7 +19,7 @@ CWindow *OvGridLayout::getNextWindowCandidate(CWindow* plastWindow) {
 
 }
 
-SOvGridNodeData *OvGridLayout::getNodeFromWindow(CWindow *pWindow)
+SOvGridNodeData *OvGridLayout::getNodeFromWindow(PHLWINDOW pWindow)
 {
     for (auto &nd : m_lOvGridNodesData)
     {
@@ -31,7 +31,7 @@ SOvGridNodeData *OvGridLayout::getNodeFromWindow(CWindow *pWindow)
 }
 
 
-SOldLayoutRecordNodeData *OvGridLayout::getOldLayoutRecordNodeFromWindow(CWindow *pWindow)
+SOldLayoutRecordNodeData *OvGridLayout::getOldLayoutRecordNodeFromWindow(PHLWINDOW pWindow)
 {
     for (auto &nd : m_lSOldLayoutRecordNodeData)
     {
@@ -63,7 +63,7 @@ void OvGridLayout::resizeNodeSizePos(SOvGridNodeData *node, int x, int y, int wi
 {   
     
     int groupbar_height_fix;
-    if(node->pWindow->m_sGroupData.pNextWindow) {
+    if(node->pWindow->m_sGroupData.pNextWindow.lock()) {
         groupbar_height_fix = g_hycov_groupBarHeight;
     } else {
         groupbar_height_fix = 0;
@@ -73,7 +73,7 @@ void OvGridLayout::resizeNodeSizePos(SOvGridNodeData *node, int x, int y, int wi
     applyNodeDataToWindow(node);
 }
 
-void OvGridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
+void OvGridLayout::onWindowCreatedTiling(PHLWINDOW pWindow, eDirection direction)
 {
     CMonitor *pTargetMonitor;
     if(g_hycov_forece_display_all_in_one_monitor) {
@@ -95,7 +95,7 @@ void OvGridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
     }
 
     //record the previcous window in group
-    if(pWindow->m_sGroupData.pNextWindow && pWindow->getGroupCurrent() == pWindow) {
+    if(pWindow->m_sGroupData.pNextWindow.lock() && pWindow->getGroupCurrent() == pWindow) {
         pNode->isGroupActive = true;
 	}
 
@@ -143,7 +143,7 @@ void OvGridLayout::onWindowCreatedTiling(CWindow *pWindow, eDirection direction)
 }
 
 
-void OvGridLayout::removeOldLayoutData(CWindow *pWindow) { 
+void OvGridLayout::removeOldLayoutData(PHLWINDOW pWindow) { 
 
 	std::string *configLayoutName = &g_hycov_configLayoutName;
     switchToLayoutWithoutReleaseData(*configLayoutName);
@@ -176,7 +176,7 @@ void OvGridLayout::removeOldLayoutData(CWindow *pWindow) {
     switchToLayoutWithoutReleaseData("ovgrid");
 }
 
-void OvGridLayout::onWindowRemoved(CWindow* pWindow) {
+void OvGridLayout::onWindowRemoved(PHLWINDOW pWindow) {
     const auto pNode = getNodeFromWindow(pWindow);
 
     if (!pNode)
@@ -190,25 +190,25 @@ void OvGridLayout::onWindowRemoved(CWindow* pWindow) {
         g_pCompositor->setWindowFullscreen(pWindow, false, FULLSCREEN_FULL);
 
 
-    if (pWindow->m_sGroupData.pNextWindow) {
-        if (pWindow->m_sGroupData.pNextWindow == pWindow)
-            pWindow->m_sGroupData.pNextWindow = nullptr;
+    if (pWindow->m_sGroupData.pNextWindow.lock()) {
+        if (pWindow->m_sGroupData.pNextWindow.lock() == pWindow)
+            pWindow->m_sGroupData.pNextWindow.lock() = nullptr;
         else {
 
             // find last window and update
-            CWindow*   PWINDOWPREV     = pWindow->getGroupPrevious();
+            PHLWINDOW   PWINDOWPREV     = pWindow->getGroupPrevious();
             const auto WINDOWISVISIBLE = pWindow->getGroupCurrent() == pWindow;
 
             if (WINDOWISVISIBLE)
-                PWINDOWPREV->setGroupCurrent(pWindow->m_sGroupData.head ? pWindow->m_sGroupData.pNextWindow : PWINDOWPREV);
+                PWINDOWPREV->setGroupCurrent(pWindow->m_sGroupData.head ? pWindow->m_sGroupData.pNextWindow.lock() : PWINDOWPREV);
 
-            PWINDOWPREV->m_sGroupData.pNextWindow = pWindow->m_sGroupData.pNextWindow;
+            PWINDOWPREV->m_sGroupData.pNextWindow.lock() = pWindow->m_sGroupData.pNextWindow.lock();
 
-            pWindow->m_sGroupData.pNextWindow = nullptr;
+            pWindow->m_sGroupData.pNextWindow.lock() = nullptr;
 
             if (pWindow->m_sGroupData.head) {
-                std::swap(PWINDOWPREV->m_sGroupData.pNextWindow->m_sGroupData.head, pWindow->m_sGroupData.head);
-                std::swap(PWINDOWPREV->m_sGroupData.pNextWindow->m_sGroupData.locked, pWindow->m_sGroupData.locked);
+                std::swap(PWINDOWPREV->m_sGroupData.pNextWindow.lock()->m_sGroupData.head, pWindow->m_sGroupData.head);
+                std::swap(PWINDOWPREV->m_sGroupData.pNextWindow.lock()->m_sGroupData.locked, pWindow->m_sGroupData.locked);
             }
 
             pWindow->setHidden(false);
@@ -218,7 +218,7 @@ void OvGridLayout::onWindowRemoved(CWindow* pWindow) {
             g_pCompositor->updateWindowAnimatedDecorationValues(pWindow);
 
             // change node bind window in group
-            pNode->pWindow = pWindow->m_sGroupData.head ? pWindow->m_sGroupData.pNextWindow : PWINDOWPREV;
+            pNode->pWindow = pWindow->m_sGroupData.head ? pWindow->m_sGroupData.pNextWindow.lock() : PWINDOWPREV;
             pNode->pWindow->m_pWorkspace = g_pCompositor->getWorkspaceByID(pNode->workspaceID);
             applyNodeDataToWindow(pNode);
             pNode->isInOldLayout = false;
@@ -236,7 +236,7 @@ void OvGridLayout::onWindowRemoved(CWindow* pWindow) {
 
 }
 
-void OvGridLayout::onWindowRemovedTiling(CWindow *pWindow)
+void OvGridLayout::onWindowRemovedTiling(PHLWINDOW pWindow)
 {
     hycov_log(LOG,"remove tiling windwo:{}",pWindow);
 
@@ -267,7 +267,7 @@ void OvGridLayout::onWindowRemovedTiling(CWindow *pWindow)
 
 }
 
-bool OvGridLayout::isWindowTiled(CWindow *pWindow)
+bool OvGridLayout::isWindowTiled(PHLWINDOW pWindow)
 {
     return getNodeFromWindow(pWindow) != nullptr;
 }
@@ -434,18 +434,18 @@ void OvGridLayout::applyNodeDataToWindow(SOvGridNodeData *pNode)
     pWindow->updateWindowDecos();
 }
 
-void OvGridLayout::recalculateWindow(CWindow *pWindow)
+void OvGridLayout::recalculateWindow(PHLWINDOW pWindow)
 {
     ; // empty
 }
 
 
-void OvGridLayout::resizeActiveWindow(const Vector2D &pixResize, eRectCorner corner, CWindow *pWindow)
+void OvGridLayout::resizeActiveWindow(const Vector2D &pixResize, eRectCorner corner, PHLWINDOW pWindow)
 {
     ; // empty
 }
 
-void OvGridLayout::fullscreenRequestForWindow(CWindow *pWindow, eFullscreenMode mode, bool on)
+void OvGridLayout::fullscreenRequestForWindow(PHLWINDOW pWindow, eFullscreenMode mode, bool on)
 {
     ; // empty
 }
@@ -455,17 +455,17 @@ std::any OvGridLayout::layoutMessage(SLayoutMessageHeader header, std::string co
     return "";
 }
 
-SWindowRenderLayoutHints OvGridLayout::requestRenderHints(CWindow *pWindow)
+SWindowRenderLayoutHints OvGridLayout::requestRenderHints(PHLWINDOW pWindow)
 {
     return {};
 }
 
-void OvGridLayout::switchWindows(CWindow *pWindowA, CWindow *pWindowB)
+void OvGridLayout::switchWindows(PHLWINDOW pWindowA, PHLWINDOW pWindowB)
 {
     ; // empty
 }
 
-void OvGridLayout::alterSplitRatio(CWindow *pWindow, float delta, bool exact)
+void OvGridLayout::alterSplitRatio(PHLWINDOW pWindow, float delta, bool exact)
 {
     ; // empty
 }
@@ -475,23 +475,23 @@ std::string OvGridLayout::getLayoutName()
     return "ovgrid";
 }
 
-void OvGridLayout::replaceWindowDataWith(CWindow *from, CWindow *to)
+void OvGridLayout::replaceWindowDataWith(PHLWINDOW from, PHLWINDOW to)
 {
     ; // empty
 }
 
-void OvGridLayout::moveWindowTo(CWindow *, const std::string &dir)
+void OvGridLayout::moveWindowTo(PHLWINDOW , const std::string &dir, bool silent)
 {
     ; // empty
 }
 
 void OvGridLayout::changeToActivceSourceWorkspace()
 {
-    CWindow *pWindow = nullptr;
+    PHLWINDOW pWindow = nullptr;
     SOvGridNodeData *pNode;
     PHLWORKSPACE pWorksapce;
     hycov_log(LOG,"changeToActivceSourceWorkspace");
-    pWindow = g_pCompositor->m_pLastWindow;
+    pWindow = g_pCompositor->m_pLastWindow.lock();
     pNode = getNodeFromWindow(pWindow);
     if(pNode) {
         pWorksapce = g_pCompositor->getWorkspaceByID(pNode->ovbk_windowWorkspaceId); 
@@ -541,7 +541,7 @@ void OvGridLayout::onEnable()
 
     for (auto &w : g_pCompositor->m_vWindows)
     {        
-        CWindow *pWindow = w.get();
+        PHLWINDOW pWindow = w;
 
         if (pWindow->isHidden() || !pWindow->m_bIsMapped || pWindow->m_bFadingOut)
             continue;

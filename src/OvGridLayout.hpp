@@ -5,7 +5,7 @@
 
 struct SOvGridNodeData
 {
-  CWindow *pWindow = nullptr;
+  PHLWINDOW pWindow = nullptr;
   int ovbk_windowWorkspaceId = -1;
   std::string ovbk_windowWorkspaceName;
   int ovbk_windowMonitorId = -1;
@@ -35,7 +35,7 @@ struct SOvGridNodeData
 
 struct SOldLayoutRecordNodeData
 {
-  CWindow *pWindow = nullptr;
+  PHLWINDOW pWindow = nullptr;
   bool operator==(const SOldLayoutRecordNodeData &rhs) const
   {
     return pWindow == rhs.pWindow;
@@ -46,36 +46,36 @@ struct SOldLayoutRecordNodeData
 class OvGridLayout : public IHyprLayout
 {
 public:
-  virtual void onWindowCreatedTiling(CWindow *, eDirection direction = DIRECTION_DEFAULT);
-  virtual void onWindowRemovedTiling(CWindow *);
-  virtual void onWindowRemoved(CWindow *);
-  virtual bool isWindowTiled(CWindow *);
-  virtual CWindow* getNextWindowCandidate(CWindow*);
+  virtual void onWindowCreatedTiling(PHLWINDOW , eDirection direction = DIRECTION_DEFAULT);
+  virtual void onWindowRemovedTiling(PHLWINDOW );
+  virtual void onWindowRemoved(PHLWINDOW );
+  virtual bool isWindowTiled(PHLWINDOW );
+  virtual PHLWINDOW getNextWindowCandidate(PHLWINDOW);
   virtual void recalculateMonitor(const int &);
-  virtual void recalculateWindow(CWindow *);
-  virtual void resizeActiveWindow(const Vector2D &, eRectCorner corner, CWindow *pWindow = nullptr);
-  virtual void fullscreenRequestForWindow(CWindow *, eFullscreenMode, bool);
+  virtual void recalculateWindow(PHLWINDOW );
+  virtual void resizeActiveWindow(const Vector2D &, eRectCorner corner, PHLWINDOW pWindow = nullptr);
+  virtual void fullscreenRequestForWindow(PHLWINDOW , eFullscreenMode, bool);
   virtual std::any layoutMessage(SLayoutMessageHeader, std::string);
-  virtual SWindowRenderLayoutHints requestRenderHints(CWindow *);
-  virtual void switchWindows(CWindow *, CWindow *);
-  virtual void alterSplitRatio(CWindow *, float, bool);
+  virtual SWindowRenderLayoutHints requestRenderHints(PHLWINDOW );
+  virtual void switchWindows(PHLWINDOW , PHLWINDOW );
+  virtual void alterSplitRatio(PHLWINDOW , float, bool);
   virtual std::string getLayoutName();
   virtual Vector2D predictSizeForNewWindowTiled();
-  virtual void replaceWindowDataWith(CWindow *from, CWindow *to);
-  virtual void moveWindowTo(CWindow *, const std::string &dir);
+  virtual void replaceWindowDataWith(PHLWINDOW from, PHLWINDOW to);
+  virtual void moveWindowTo(PHLWINDOW, const std::string& direction, bool silent = false);
   virtual void onEnable();
   virtual void onDisable();
   void applyNodeDataToWindow(SOvGridNodeData *);
   void calculateWorkspace(const int &);
   int getNodesNumOnWorkspace(const int &);
-  SOvGridNodeData *getNodeFromWindow(CWindow *);
-  SOldLayoutRecordNodeData *getOldLayoutRecordNodeFromWindow(CWindow *);
+  SOvGridNodeData *getNodeFromWindow(PHLWINDOW );
+  SOldLayoutRecordNodeData *getOldLayoutRecordNodeFromWindow(PHLWINDOW );
   void resizeNodeSizePos(SOvGridNodeData *, int, int, int, int);
-  void moveWindowToWorkspaceSilent(CWindow *, const int &);
+  void moveWindowToWorkspaceSilent(PHLWINDOW , const int &);
   std::list<SOvGridNodeData> m_lOvGridNodesData; 
   std::list<SOldLayoutRecordNodeData> m_lSOldLayoutRecordNodeData; 
   void moveWindowToSourceWorkspace();
   void changeToActivceSourceWorkspace();
-  void removeOldLayoutData(CWindow *pWindow);
+  void removeOldLayoutData(PHLWINDOW pWindow);
 private:
 };
