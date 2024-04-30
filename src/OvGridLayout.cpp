@@ -103,7 +103,7 @@ void OvGridLayout::onWindowRemoved(CWindow* pWindow) {
             g_pCompositor->updateWindowAnimatedDecorationValues(pWindow);
 
             // change node bind window in group
-            pNode->pWindow = pWindow->m_sGroupData.head ? pWindow->m_sGroupData.pNextWindow : PWINDOWPREV;
+            pNode->pWindow = PWINDOWPREV->getGroupCurrent();
             pNode->pWindow->m_iWorkspaceID = pNode->workspaceID;
             applyNodeDataToWindow(pNode);
             pNode->isInOldLayout = false;
