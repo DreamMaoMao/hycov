@@ -16,7 +16,7 @@ typedef void (*origStartAnim)(void*, bool in, bool left, bool instant);
 typedef void (*origFullscreenActive)(std::string args);
 typedef void (*origOnKeyboardKey)(void*, std::any e, SP<IKeyboard> pKeyboard);
 typedef void (*origCInputManager_onMouseButton)(void* , wlr_pointer_button_event* e);
-
+typedef void (*origCInputManager_mouseMoveUnified)(void* , uint32_t time, bool refocus);
 
 static double gesture_dx,gesture_previous_dx;
 static double gesture_dy,gesture_previous_dy;
@@ -136,10 +136,14 @@ static void toggle_hotarea(int x_root, int y_root)
   }
 }
 
-static void hkmouseMove(void *, SCallbackInfo &info, std::any data)
+static void hkCInputManager_mouseMoveUnified(void* thisptr, uint32_t time, bool refocus)
 {
-  const Vector2D coordinate = std::any_cast<const Vector2D>(data);
-  toggle_hotarea(coordinate.x, coordinate.y);
+  (*(origCInputManager_mouseMoveUnified)g_hycov_pCInputManager_mouseMoveUnifiedHook->m_pOriginal)(thisptr, time, refocus);
+
+  Vector2D   mouseCoords        = g_pInputManager->getMouseCoordsInternal();
+  const auto MOUSECOORDSFLOORED = mouseCoords.floor();
+
+  toggle_hotarea(MOUSECOORDSFLOORED.x, MOUSECOORDSFLOORED.y);
 }
 
 static void hkCInputManager_onMouseButton(void* thisptr, wlr_pointer_button_event* e)
@@ -384,6 +388,9 @@ void registerGlobalEventHook()
   g_hycov_pCKeybindManager_toggleGroupHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CKeybindManager::toggleGroup, (void*)&hkCKeybindManager_toggleGroup);
   //moveOutOfGroup
   g_hycov_pCKeybindManager_moveOutOfGroupHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CKeybindManager::moveOutOfGroup, (void*)&hkCKeybindManager_moveOutOfGroup);
+  //mouse
+  g_hycov_pCInputManager_mouseMoveUnifiedHook = HyprlandAPI::createFunctionHook(PHANDLE, (void*)&CInputManager::mouseMoveUnified, (void*)&hkCInputManager_mouseMoveUnified);
+
 
   //create private function hook
 
@@ -405,7 +412,8 @@ void registerGlobalEventHook()
 
   //register pEvent hook
   if(g_hycov_enable_hotarea){
-    static auto mouseMoveHook = HyprlandAPI::registerCallbackDynamic(PHANDLE, "mouseMove",[&](void* self, SCallbackInfo& info, std::any data) { hkmouseMove(self, info, data); });
+    g_hycov_pCInputManager_mouseMoveUnifiedHook->hook();
+    // static auto mouseMoveHook = HyprlandAPI::registerCallbackDynamic(PHANDLE, "mouseMove",[&](void* self, SCallbackInfo& info, std::any data) { hkmouseMove(self, info, data); });
   }
 
   if(g_hycov_enable_click_action) {

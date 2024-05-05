@@ -69,6 +69,7 @@ inline CFunctionHook* g_hycov_pCInputManager_onMouseButtonHook = nullptr;
 inline CFunctionHook* g_hycov_pCKeybindManager_changeGroupActiveHook = nullptr;  
 inline CFunctionHook* g_hycov_pCKeybindManager_toggleGroupHook = nullptr;
 inline CFunctionHook* g_hycov_pCKeybindManager_moveOutOfGroupHook = nullptr;
+inline CFunctionHook* g_hycov_pCInputManager_mouseMoveUnifiedHook = nullptr;
 
 inline void errorNotif()
 {
