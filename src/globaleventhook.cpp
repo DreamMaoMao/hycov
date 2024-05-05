@@ -405,8 +405,11 @@ void registerGlobalEventHook()
 
   //register pEvent hook
   if(g_hycov_enable_hotarea){
-    g_hycov_pCInputManager_onMouseButtonHook->hook();
     static auto mouseMoveHook = HyprlandAPI::registerCallbackDynamic(PHANDLE, "mouseMove",[&](void* self, SCallbackInfo& info, std::any data) { hkmouseMove(self, info, data); });
+  }
+
+  if(g_hycov_enable_click_action) {
+    g_hycov_pCInputManager_onMouseButtonHook->hook();
   }
 
   //if enable gesture, apply hook Swipe function 
