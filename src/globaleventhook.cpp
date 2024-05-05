@@ -425,8 +425,8 @@ void registerGlobalEventHook()
   }
 
   //apply hook OnKeyboardKey function
-  // if (g_hycov_enable_alt_release_exit) {
+  if (g_hycov_enable_alt_release_exit) {
       g_hycov_pOnKeyboardKeyHook->hook();
-  // }
+  }
 
 }
