@@ -14,16 +14,16 @@ typedef void (*origOnSwipeUpdate)(void*, wlr_pointer_swipe_update_event* e);
 typedef void (*origCWindow_onUnmap)(void*);
 typedef void (*origStartAnim)(void*, bool in, bool left, bool instant);
 typedef void (*origFullscreenActive)(std::string args);
-typedef void (*origOnKeyboardKey)(void*, wlr_keyboard_key_event* e, SKeyboard* pKeyboard);
+typedef void (*origOnKeyboardKey)(void*, std::any e, SP<IKeyboard> pKeyboard);
 typedef void (*origCInputManager_onMouseButton)(void* , wlr_pointer_button_event* e);
 
 
 static double gesture_dx,gesture_previous_dx;
 static double gesture_dy,gesture_previous_dy;
 
-std::string getKeynameFromKeycode(wlr_keyboard_key_event* e, SKeyboard* pKeyboard) {
-  struct wlr_keyboard *keyboard =  (struct wlr_keyboard *)pKeyboard->keyboard;
-  xkb_keycode_t keycode = e->keycode + 8;
+std::string getKeynameFromKeycode(IKeyboard::SKeyEvent e, SP<IKeyboard> pKeyboard) {
+  auto keyboard = pKeyboard->wlr();
+  xkb_keycode_t keycode = e.keycode + 8;
   xkb_keysym_t keysym = xkb_state_key_get_one_sym(keyboard->xkb_state, keycode);
   char *tmp_keyname = new char[64];
   xkb_keysym_get_name(keysym, tmp_keyname, 64);
@@ -32,13 +32,13 @@ std::string getKeynameFromKeycode(wlr_keyboard_key_event* e, SKeyboard* pKeyboar
   return keyname;
 }
 
-bool isKeyReleaseToggleExitOverviewHit(wlr_keyboard_key_event* e, SKeyboard* pKeyboard) {
+bool isKeyReleaseToggleExitOverviewHit(IKeyboard::SKeyEvent e, SP<IKeyboard> pKeyboard) {
   if (g_hycov_alt_replace_key == "")
     return false;
 
-  if (isNumber(g_hycov_alt_replace_key) && std::stoi(g_hycov_alt_replace_key) > 9 && std::stoi(g_hycov_alt_replace_key) == (e->keycode + 8)) {
+  if (isNumber(g_hycov_alt_replace_key) && std::stoi(g_hycov_alt_replace_key) > 9 && std::stoi(g_hycov_alt_replace_key) == (e.keycode + 8)) {
     return true;
-  } else if (g_hycov_alt_replace_key.find("code:") == 0 && isNumber(g_hycov_alt_replace_key.substr(5)) && std::stoi(g_hycov_alt_replace_key.substr(5)) == (e->keycode + 8)) {
+  } else if (g_hycov_alt_replace_key.find("code:") == 0 && isNumber(g_hycov_alt_replace_key.substr(5)) && std::stoi(g_hycov_alt_replace_key.substr(5)) == (e.keycode + 8)) {
     return true;
   } else {
     std::string keyname = getKeynameFromKeycode(e,pKeyboard);
@@ -233,11 +233,13 @@ static void hkStartAnim(void* thisptr,bool in, bool left, bool instant = false) 
   }
 }
 
-static void hkOnKeyboardKey(void* thisptr,wlr_keyboard_key_event* e, SKeyboard* pKeyboard) {
+static void hkOnKeyboardKey(void* thisptr,std::any event, SP<IKeyboard> pKeyboard) {
 
-  (*(origOnKeyboardKey)g_hycov_pOnKeyboardKeyHook->m_pOriginal)(thisptr, e, pKeyboard);
-  // hycov_log(LOG,"alt key,keycode:{}",e->keycode);
-  if(g_hycov_enable_alt_release_exit && g_hycov_isOverView && e->state == WL_KEYBOARD_KEY_STATE_RELEASED) {
+  (*(origOnKeyboardKey)g_hycov_pOnKeyboardKeyHook->m_pOriginal)(thisptr, event, pKeyboard);
+
+  auto e = std::any_cast<IKeyboard::SKeyEvent>(event);
+  // hycov_log(LOG,"alt key,keycode:{}",e.keycode);
+  if(g_hycov_enable_alt_release_exit && g_hycov_isOverView && e.state == WL_KEYBOARD_KEY_STATE_RELEASED) {
     if (!isKeyReleaseToggleExitOverviewHit(e,pKeyboard))
       return;
     dispatch_leaveoverview("");
@@ -420,8 +422,8 @@ void registerGlobalEventHook()
   }
 
   //apply hook OnKeyboardKey function
-  if (g_hycov_enable_alt_release_exit) {
+  // if (g_hycov_enable_alt_release_exit) {
       g_hycov_pOnKeyboardKeyHook->hook();
-  }
+  // }
 
 }
