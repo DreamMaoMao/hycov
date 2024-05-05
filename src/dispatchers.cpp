@@ -275,9 +275,6 @@ PHLWINDOW get_circle_next_window (std::string arg) {
 void warpcursor_and_focus_to_window(PHLWINDOW pWindow) {
 	g_pCompositor->focusWindow(pWindow);
 	g_pCompositor->warpCursorTo(pWindow->middle());
-	g_pInputManager->m_pForcedFocus = pWindow;
-    g_pInputManager->simulateMouseMovement();
-    g_pInputManager->m_pForcedFocus.lock() = nullptr;
 }
 
 void dispatch_circle(std::string arg)
