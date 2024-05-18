@@ -106,7 +106,7 @@ static void hkOnSwipeEnd(void* thisptr, wlr_pointer_swipe_end_event* e) {
 
 static void toggle_hotarea(int x_root, int y_root)
 {
-  CMonitor *pMonitor = g_pCompositor->m_pLastMonitor;
+  CMonitor *pMonitor = g_pCompositor->m_pLastMonitor.get();
 
   if (g_hycov_hotarea_monitor != "all" && pMonitor->szName != g_hycov_hotarea_monitor)
     return;

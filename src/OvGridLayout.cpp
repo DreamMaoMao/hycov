@@ -77,7 +77,7 @@ void OvGridLayout::onWindowCreatedTiling(PHLWINDOW pWindow, eDirection direction
 {
     CMonitor *pTargetMonitor;
     if(g_hycov_forece_display_all_in_one_monitor) {
-        pTargetMonitor = g_pCompositor->m_pLastMonitor;
+        pTargetMonitor = g_pCompositor->m_pLastMonitor.get();
     } else {
       pTargetMonitor =  g_pCompositor->getMonitorFromID(pWindow->m_iMonitorID); 
     }

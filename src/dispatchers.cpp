@@ -383,7 +383,7 @@ void dispatch_enteroverview(std::string arg)
 	g_pLayoutManager->getCurrentLayout()->onEnable();
 
 	//change workspace name to OVERVIEW
-	pActiveMonitor	= g_pCompositor->m_pLastMonitor;
+	pActiveMonitor	= g_pCompositor->m_pLastMonitor.get();
 	pActiveWorkspace = g_pCompositor->getWorkspaceByID(pActiveMonitor->activeWorkspace->m_iID);
 	workspaceNameBackup = pActiveWorkspace->m_szName;
 	workspaceIdBackup = pActiveWorkspace->m_iID;
