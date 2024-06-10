@@ -339,6 +339,14 @@ void dispatch_enteroverview(std::string arg)
 		g_hycov_forece_display_all_in_one_monitor = false;
 	}
 
+	//force only display current workspace,ignore `only_active_worksapce` and `only_active_monitor`
+	if (arg == "onlycurrentworkspace") {
+		g_hycov_force_display_only_current_workspace = true;
+		hycov_log(LOG,"force display only current workspace");
+	} else {
+		g_hycov_force_display_only_current_workspace = false;
+	}
+
 	//ali clients exit fullscreen status before enter overview
 	PHLWINDOW pFullscreenWindow;
 	PHLWINDOW pActiveWindow = g_pCompositor->m_pLastWindow.lock();

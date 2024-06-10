@@ -70,6 +70,9 @@ bind = ALT,tab,hycov:toggleoverview
 # bind key to toggle overview (force mode, not affected by `only_active_workspace` or `only_active_monitor`)
 bind = ALT,grave,hycov:toggleoverview,forceall #grave key is the '~' key
 
+# bind key to toggle overview (force mode, not affected by `only_active_workspace` or `only_active_monitor`)
+bind = ALT,c,hycov:toggleoverview,onlycurrentworkspace
+
 # bind key to toggle overview (shows all windows in one monitor, not affected by `only_active_workspace` or `only_active_monitor`)
 bind = ALT,g,hycov:toggleoverview,forceallinone 
 

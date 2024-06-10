@@ -50,6 +50,7 @@ inline int g_hycov_raise_float_to_top;
 inline bool g_hycov_isOverViewExiting;
 inline bool g_hycov_forece_display_all = false;
 inline bool g_hycov_forece_display_all_in_one_monitor = false;
+inline bool g_hycov_force_display_only_current_workspace = false;
 inline int g_hycov_groupBarHeight;
 
 inline CFunctionHook* g_hycov_pOnSwipeBeginHook = nullptr;

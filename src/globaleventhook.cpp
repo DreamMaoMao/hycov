@@ -203,7 +203,7 @@ static void hkCWindow_onUnmap(void* thisptr) {
     return;
   }
 
-  if (g_hycov_isOverView && nodeNumInSameWorkspace == 0 && g_hycov_only_active_workspace) {
+  if (g_hycov_isOverView && nodeNumInSameWorkspace == 0 && (g_hycov_only_active_workspace || g_hycov_force_display_only_current_workspace)) {
     hycov_log(LOG,"no tiling windwo in same workspace,auto exit overview");
     dispatch_leaveoverview("");
     return;
