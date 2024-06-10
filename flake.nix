@@ -1,17 +1,21 @@
 {
   description = "Hyprland Plugins (Hycov)";
 
-  inputs.hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
+  inputs = {
+    hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
+    nixpkgs.follows = "hyprland/nixpkgs";
+    systems.follows = "hyprland/systems";
+  };
 
   outputs =
     { self
     , hyprland
+    , nixpkgs
+    , systems
     }:
     let
-      inherit (hyprland.inputs) nixpkgs;
       inherit (nixpkgs) lib;
-      systems = lib.attrNames hyprland.packages;
-      withPkgsFor = fn: lib.genAttrs systems (system:
+      withPkgsFor = fn: lib.genAttrs (import systems) (system:
         let
           pkgs = import nixpkgs {
             localSystem.system = system;
