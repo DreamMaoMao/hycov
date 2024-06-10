@@ -1,7 +1,7 @@
 {
   description = "Hyprland Plugins";
 
-  inputs.hyprland.url = "github:hyprwm/Hyprland";
+  inputs.hyprland.url = "git+https://github.com/hyprwm/Hyprland?submodules=1";
 
   outputs =
     { self
