@@ -544,7 +544,7 @@ void dispatch_leaveoverview(std::string arg)
 			g_pCompositor->focusWindow(pActiveWindow); //restore the focus to before active window
 		}
 
-		if(pActiveWindow->m_bIsFloating) {
+		if(pActiveWindow->m_bIsFloating && g_hycov_raise_float_to_top) {
 			g_pCompositor->changeWindowZOrder(pActiveWindow, true);
 		} else if(g_hycov_auto_fullscreen && want_auto_fullscren(pActiveWindow)) { // if enale auto_fullscreen after exit overview
 			g_pCompositor->setWindowFullscreen(pActiveWindow,true,FULLSCREEN_MAXIMIZED);

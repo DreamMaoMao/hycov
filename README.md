@@ -109,7 +109,7 @@ plugin {
         click_in_cursor = 1 # when click to jump,the target windwo is find by cursor, not the current foucus window.
         hight_of_titlebar = 0 # height deviation of title bar height
         show_special = 0 # show windwos in special workspace in overview.
-
+        raise_float_to_top = 1 # raise the window that is floating before to top after leave overview mode
     }
 }
 

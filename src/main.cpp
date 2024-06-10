@@ -34,7 +34,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 	CONF("alt_replace_key", "Alt_L");
 	CONF("show_special",  0L);
 	CONF("enable_click_action",  1L);
-
+	CONF("raise_float_to_top",  1L);
 
 #undef CONF
 
@@ -63,6 +63,7 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
     static const auto *pOverview_gappi = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:overview_gappi")->getDataStaticPtr());
 	static const auto *pShow_special_config = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:show_special")->getDataStaticPtr());
 	static const auto *pEnable_click_action_config = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:enable_click_action")->getDataStaticPtr());
+	static const auto *pRaise_float_to_top = (Hyprlang::INT* const*)(HyprlandAPI::getConfigValue(PHANDLE, "plugin:hycov:raise_float_to_top")->getDataStaticPtr());
 
 
 	// string value
@@ -94,6 +95,8 @@ APICALL EXPORT PLUGIN_DESCRIPTION_INFO PLUGIN_INIT(HANDLE handle)
 	g_hycov_overview_gappi = **pOverview_gappi;
 	g_hycov_show_special = **pShow_special_config;
 	g_hycov_enable_click_action = **pEnable_click_action_config;
+	g_hycov_raise_float_to_top = **pRaise_float_to_top;
+
 
 	// string value
 	g_hycov_alt_replace_key = *pAlt_replace_key;

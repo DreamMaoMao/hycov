@@ -44,6 +44,7 @@ inline int g_hycov_overview_gappi;
 inline std::string g_hycov_configLayoutName;
 inline int g_hycov_show_special;
 inline int g_hycov_enable_click_action;
+inline int g_hycov_raise_float_to_top;
 
 
 inline bool g_hycov_isOverViewExiting;
