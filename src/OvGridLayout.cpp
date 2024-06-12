@@ -77,7 +77,7 @@ void OvGridLayout::onWindowCreatedTiling(PHLWINDOW pWindow, eDirection direction
 {
     CMonitor *pTargetMonitor;
     if(g_hycov_forece_display_all_in_one_monitor) {
-        pTargetMonitor = g_pCompositor->m_pLastMonitor;
+        pTargetMonitor = g_pCompositor->m_pLastMonitor.get();
     } else {
       pTargetMonitor =  g_pCompositor->getMonitorFromID(pWindow->m_iMonitorID); 
     }
@@ -396,6 +396,10 @@ void OvGridLayout::calculateWorkspace(const int &ws)
 void OvGridLayout::recalculateMonitor(const int &monid)
 {
     const auto pMonitor = g_pCompositor->getMonitorFromID(monid);                       // 根据monitor id获取monitor对象
+
+    if (!pMonitor || !pMonitor->activeWorkspace)
+        return;
+
     g_pHyprRenderer->damageMonitor(pMonitor); // Use local rendering
 
     if (pMonitor->activeSpecialWorkspaceID()) {

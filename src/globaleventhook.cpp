@@ -1,5 +1,3 @@
-
-#include "globaleventhook.hpp"
 #include "dispatchers.hpp"
 #include <regex>
 #include <set>
@@ -15,7 +13,7 @@ typedef void (*origCWindow_onUnmap)(void*);
 typedef void (*origStartAnim)(void*, bool in, bool left, bool instant);
 typedef void (*origFullscreenActive)(std::string args);
 typedef void (*origOnKeyboardKey)(void*, std::any e, SP<IKeyboard> pKeyboard);
-typedef void (*origCInputManager_onMouseButton)(void* , wlr_pointer_button_event* e);
+typedef void (*origCInputManager_onMouseButton)(void*, IPointer::SButtonEvent e);
 typedef void (*origCInputManager_mouseMoveUnified)(void* , uint32_t time, bool refocus);
 
 static double gesture_dx,gesture_previous_dx;
@@ -106,7 +104,7 @@ static void hkOnSwipeEnd(void* thisptr, wlr_pointer_swipe_end_event* e) {
 
 static void toggle_hotarea(int x_root, int y_root)
 {
-  CMonitor *pMonitor = g_pCompositor->m_pLastMonitor;
+  CMonitor *pMonitor = g_pCompositor->m_pLastMonitor.get();
 
   if (g_hycov_hotarea_monitor != "all" && pMonitor->szName != g_hycov_hotarea_monitor)
     return;
@@ -146,9 +144,9 @@ static void hkCInputManager_mouseMoveUnified(void* thisptr, uint32_t time, bool 
   toggle_hotarea(MOUSECOORDSFLOORED.x, MOUSECOORDSFLOORED.y);
 }
 
-static void hkCInputManager_onMouseButton(void* thisptr, wlr_pointer_button_event* e)
+static void hkCInputManager_onMouseButton(void* thisptr, IPointer::SButtonEvent e)
 {
-  if(g_hycov_isOverView && (e->button == BTN_LEFT || e->button == BTN_RIGHT) ) {
+  if(g_hycov_isOverView && (e.button == BTN_LEFT || e.button == BTN_RIGHT) ) {
 
     if (g_hycov_click_in_cursor) {
         g_pInputManager->refocus();
@@ -158,17 +156,17 @@ static void hkCInputManager_onMouseButton(void* thisptr, wlr_pointer_button_even
       return;
     }
 
-    switch (e->button)
+    switch (e.button)
     {
     case BTN_LEFT:
-      if (g_hycov_isOverView && e->state == WLR_BUTTON_PRESSED)
+      if (g_hycov_isOverView && e.state == WLR_BUTTON_PRESSED)
       {
         dispatch_toggleoverview("internalToggle");
         return;
       }
       break;
     case BTN_RIGHT:
-      if (g_hycov_isOverView && e->state == WLR_BUTTON_PRESSED)
+      if (g_hycov_isOverView && e.state == WLR_BUTTON_PRESSED)
       {
         g_pCompositor->closeWindow(g_pCompositor->m_pLastWindow.lock());
         return;
