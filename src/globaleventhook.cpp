@@ -1,3 +1,5 @@
+
+#include "globaleventhook.hpp"
 #include "dispatchers.hpp"
 #include <regex>
 #include <set>
@@ -159,14 +161,14 @@ static void hkCInputManager_onMouseButton(void* thisptr, IPointer::SButtonEvent 
     switch (e.button)
     {
     case BTN_LEFT:
-      if (g_hycov_isOverView && e.state == WLR_BUTTON_PRESSED)
+      if (g_hycov_isOverView && e.state == WL_POINTER_BUTTON_STATE_PRESSED)
       {
         dispatch_toggleoverview("internalToggle");
         return;
       }
       break;
     case BTN_RIGHT:
-      if (g_hycov_isOverView && e.state == WLR_BUTTON_PRESSED)
+      if (g_hycov_isOverView && e.state == WL_POINTER_BUTTON_STATE_PRESSED)
       {
         g_pCompositor->closeWindow(g_pCompositor->m_pLastWindow.lock());
         return;

@@ -9,6 +9,7 @@
 #include <hyprland/src/plugins/PluginAPI.hpp>
 #include <hyprland/src/managers/KeybindManager.hpp>
 #include <hyprland/src/devices/Keyboard.hpp>
+#include <hyprland/src/devices/IPointer.hpp>
 #undef private
 
 #include "OvGridLayout.hpp"

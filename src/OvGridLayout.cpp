@@ -396,10 +396,6 @@ void OvGridLayout::calculateWorkspace(const int &ws)
 void OvGridLayout::recalculateMonitor(const int &monid)
 {
     const auto pMonitor = g_pCompositor->getMonitorFromID(monid);                       // 根据monitor id获取monitor对象
-
-    if (!pMonitor || !pMonitor->activeWorkspace)
-        return;
-
     g_pHyprRenderer->damageMonitor(pMonitor); // Use local rendering
 
     if (pMonitor->activeSpecialWorkspaceID()) {
