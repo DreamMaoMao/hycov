@@ -10,6 +10,7 @@
 #include <hyprland/src/managers/KeybindManager.hpp>
 #include <hyprland/src/devices/Keyboard.hpp>
 #include <hyprland/src/devices/IPointer.hpp>
+#include <hyprutils/string/String.hpp>
 #undef private
 
 #include "OvGridLayout.hpp"
